@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '../../../lib/supabaseClient'
 
-export default function ConfirmEmail() {
+function ConfirmEmailContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState('confirming')
@@ -129,5 +129,20 @@ export default function ConfirmEmail() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ConfirmEmail() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">⏳</div>
+          <p className="text-lg">Loading...</p>
+        </div>
+      </div>
+    }>
+      <ConfirmEmailContent />
+    </Suspense>
   )
 }
