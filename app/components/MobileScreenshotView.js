@@ -35,9 +35,9 @@ export default function MobileScreenshotView({
   const thisWeekGoals = thisWeekData.filter(log => log.goal_met).length
 
   return (
-    <div className="w-full max-w-sm mx-auto bg-stone-50 rounded-3xl overflow-hidden shadow-2xl" style={{ aspectRatio: '9/16' }}>
+    <div className="w-full max-w-sm mx-auto bg-stone-50 rounded-3xl overflow-hidden shadow-2xl" style={{ maxHeight: '85vh' }}>
       {/* Header */}
-      <div className="bg-white p-6 text-center border-b" style={{ borderColor: 'var(--accent-primary)' }}>
+      <div className="bg-white p-4 text-center border-b" style={{ borderColor: 'var(--accent-primary)' }}>
         <div className="flex items-center justify-center gap-3 mb-3">
           <Image 
             src="/replyguylogo.png" 
@@ -62,9 +62,9 @@ export default function MobileScreenshotView({
       </div>
 
       {/* Main Stats */}
-      <div className="p-6 space-y-6">
+      <div className="p-4 space-y-4">
         {/* Today's Progress */}
-        <div className="bg-white rounded-2xl p-5 border border-stone-200">
+        <div className="bg-white rounded-2xl p-4 border border-stone-200">
           <div className="text-center mb-4">
             <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Today's Progress</h2>
             {goalMet && (

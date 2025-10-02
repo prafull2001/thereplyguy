@@ -430,9 +430,9 @@ export default function Dashboard() {
   // Show mobile screenshot view when in screenshot mode
   if (screenshotMode) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 py-8">
-        <div className="max-w-md mx-auto">
-          <div className="mb-6 text-center">
+      <div className="min-h-screen w-full overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
+        <div className="max-w-md mx-auto py-4">
+          <div className="mb-4 text-center">
             <button
               onClick={() => setScreenshotMode(false)}
               className="text-sm px-4 py-2 rounded-lg border-2 border-purple-300 text-purple-600 hover:border-purple-400 transition-colors font-medium mb-2"
