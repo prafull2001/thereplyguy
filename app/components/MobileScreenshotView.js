@@ -144,8 +144,8 @@ export default function MobileScreenshotView({
         {/* Follower Growth Chart */}
         <div className="bg-white rounded-xl p-4 border border-stone-200">
           <h3 className="text-sm font-bold mb-3 text-center" style={{ color: 'var(--text-primary)' }}>Follower Growth</h3>
-          <div className="h-16 relative">
-            <svg width="100%" height="100%" viewBox="0 0 280 64" className="overflow-visible">
+          <div className="h-20 relative">
+            <svg width="100%" height="100%" viewBox="0 0 280 80" className="overflow-visible">
               {(() => {
                 const chartData = historicalData.slice(-7)
                 if (chartData.length === 0) return null
@@ -156,23 +156,42 @@ export default function MobileScreenshotView({
                 
                 const points = chartData.map((log, i) => {
                   const x = (i / (chartData.length - 1)) * 240 + 20
-                  const y = 52 - ((log.follower_count - minFollowers) / range) * 40
+                  const y = 60 - ((log.follower_count - minFollowers) / range) * 40
                   return `${x},${y}`
                 }).join(' ')
                 
                 return (
                   <>
+                    {/* Grid lines */}
+                    <defs>
+                      <pattern id="grid" width="40" height="10" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 10" fill="none" stroke="#f3f4f6" strokeWidth="0.5"/>
+                      </pattern>
+                    </defs>
+                    <rect width="240" height="40" x="20" y="20" fill="url(#grid)" />
+                    
+                    {/* Y-axis labels */}
+                    <text x="15" y="25" fontSize="8" fill="var(--text-secondary)" textAnchor="end">
+                      {maxFollowers.toLocaleString()}
+                    </text>
+                    <text x="15" y="45" fontSize="8" fill="var(--text-secondary)" textAnchor="end">
+                      {Math.round((maxFollowers + minFollowers) / 2).toLocaleString()}
+                    </text>
+                    <text x="15" y="65" fontSize="8" fill="var(--text-secondary)" textAnchor="end">
+                      {minFollowers.toLocaleString()}
+                    </text>
+                    
                     {/* Line */}
                     <polyline
                       fill="none"
                       stroke="var(--accent-secondary)"
-                      strokeWidth="2"
+                      strokeWidth="2.5"
                       points={points}
                     />
                     {/* Points */}
                     {chartData.map((log, i) => {
                       const x = (i / (chartData.length - 1)) * 240 + 20
-                      const y = 52 - ((log.follower_count - minFollowers) / range) * 40
+                      const y = 60 - ((log.follower_count - minFollowers) / range) * 40
                       return (
                         <circle
                           key={i}
@@ -180,6 +199,8 @@ export default function MobileScreenshotView({
                           cy={y}
                           r="3"
                           fill="var(--accent-secondary)"
+                          stroke="white"
+                          strokeWidth="1"
                         />
                       )
                     })}
@@ -187,16 +208,20 @@ export default function MobileScreenshotView({
                 )
               })()}
             </svg>
-            {/* Day labels */}
+            {/* Day labels - only show first, middle, and last */}
             <div className="flex justify-between absolute bottom-0 left-0 right-0 px-5">
-              {historicalData.slice(-7).map((log, i) => (
-                <div key={i} className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                  {new Date(log.log_date).toLocaleDateString('en-US', { weekday: 'short' }).charAt(0)}
-                </div>
-              ))}
+              {historicalData.slice(-7).map((log, i, arr) => {
+                // Only show labels for first, middle, and last points to avoid clutter
+                const showLabel = i === 0 || i === Math.floor(arr.length / 2) || i === arr.length - 1
+                return (
+                  <div key={i} className="text-xs flex-1 text-center" style={{ color: showLabel ? 'var(--text-secondary)' : 'transparent' }}>
+                    {showLabel ? new Date(log.log_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
+                  </div>
+                )
+              })}
             </div>
           </div>
-          <div className="text-center mt-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
+          <div className="text-center mt-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
             {historicalData.length > 0 && (
               <>
                 {historicalData[historicalData.length - 1]?.follower_count?.toLocaleString() || 0} followers 
