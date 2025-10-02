@@ -35,9 +35,9 @@ export default function MobileScreenshotView({
   const thisWeekGoals = thisWeekData.filter(log => log.goal_met).length
 
   return (
-    <div className="w-full max-w-sm mx-auto bg-stone-50 rounded-3xl overflow-hidden shadow-2xl" style={{ maxHeight: '85vh' }}>
+    <div className="w-full max-w-sm mx-auto bg-stone-50 rounded-3xl overflow-hidden shadow-2xl" style={{ maxHeight: '90vh' }}>
       {/* Header */}
-      <div className="bg-white p-4 text-center border-b" style={{ borderColor: 'var(--accent-primary)' }}>
+      <div className="bg-white p-3 text-center border-b" style={{ borderColor: 'var(--accent-primary)' }}>
         <div className="flex items-center justify-center gap-3 mb-3">
           <Image 
             src="/replyguylogo.png" 
@@ -62,9 +62,9 @@ export default function MobileScreenshotView({
       </div>
 
       {/* Main Stats */}
-      <div className="p-4 space-y-4">
+      <div className="p-3 space-y-3">
         {/* Today's Progress */}
-        <div className="bg-white rounded-2xl p-4 border border-stone-200">
+        <div className="bg-white rounded-2xl p-3 border border-stone-200">
           <div className="text-center mb-4">
             <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>📊 Today's Progress</h2>
             {goalMet && (
@@ -115,8 +115,8 @@ export default function MobileScreenshotView({
         </div>
 
         {/* Weekly & Overall Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white rounded-xl p-4 text-center border border-stone-200">
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-white rounded-xl p-3 text-center border border-stone-200">
             <div className="text-3xl font-bold mb-1" style={{ color: 'var(--accent-secondary)' }}>
               {thisWeekGoals}
             </div>
@@ -128,7 +128,7 @@ export default function MobileScreenshotView({
             </div>
           </div>
           
-          <div className="bg-white rounded-xl p-4 text-center border border-stone-200">
+          <div className="bg-white rounded-xl p-3 text-center border border-stone-200">
             <div className="text-3xl font-bold mb-1" style={{ color: 'var(--accent-tertiary)' }}>
               {successRate}%
             </div>
@@ -142,10 +142,10 @@ export default function MobileScreenshotView({
         </div>
 
         {/* Follower Growth Chart */}
-        <div className="bg-white rounded-xl p-4 border border-stone-200">
-          <h3 className="text-lg font-bold mb-3 text-center" style={{ color: 'var(--text-primary)' }}>📈 Follower Growth</h3>
-          <div className="h-20 relative">
-            <svg width="100%" height="100%" viewBox="0 0 280 80" className="overflow-visible">
+        <div className="bg-white rounded-xl p-3 border border-stone-200">
+          <h3 className="text-base font-bold mb-2 text-center" style={{ color: 'var(--text-primary)' }}>📈 Follower Growth</h3>
+          <div className="h-16 relative">
+            <svg width="100%" height="100%" viewBox="0 0 280 64" className="overflow-visible">
               {(() => {
                 const chartData = historicalData.slice(-7)
                 if (chartData.length === 0) return null
@@ -156,7 +156,7 @@ export default function MobileScreenshotView({
                 
                 const points = chartData.map((log, i) => {
                   const x = (i / (chartData.length - 1)) * 240 + 20
-                  const y = 60 - ((log.follower_count - minFollowers) / range) * 40
+                  const y = 48 - ((log.follower_count - minFollowers) / range) * 32
                   return `${x},${y}`
                 }).join(' ')
                 
@@ -168,16 +168,16 @@ export default function MobileScreenshotView({
                         <path d="M 40 0 L 0 0 0 10" fill="none" stroke="#f3f4f6" strokeWidth="0.5"/>
                       </pattern>
                     </defs>
-                    <rect width="240" height="40" x="20" y="20" fill="url(#grid)" />
+                    <rect width="240" height="32" x="20" y="16" fill="url(#grid)" />
                     
                     {/* Y-axis labels */}
-                    <text x="15" y="25" fontSize="8" fill="var(--text-secondary)" textAnchor="end">
+                    <text x="15" y="20" fontSize="8" fill="var(--text-secondary)" textAnchor="end">
                       {maxFollowers.toLocaleString()}
                     </text>
-                    <text x="15" y="45" fontSize="8" fill="var(--text-secondary)" textAnchor="end">
+                    <text x="15" y="36" fontSize="8" fill="var(--text-secondary)" textAnchor="end">
                       {Math.round((maxFollowers + minFollowers) / 2).toLocaleString()}
                     </text>
-                    <text x="15" y="65" fontSize="8" fill="var(--text-secondary)" textAnchor="end">
+                    <text x="15" y="52" fontSize="8" fill="var(--text-secondary)" textAnchor="end">
                       {minFollowers.toLocaleString()}
                     </text>
                     
@@ -191,7 +191,7 @@ export default function MobileScreenshotView({
                     {/* Points */}
                     {chartData.map((log, i) => {
                       const x = (i / (chartData.length - 1)) * 240 + 20
-                      const y = 60 - ((log.follower_count - minFollowers) / range) * 40
+                      const y = 48 - ((log.follower_count - minFollowers) / range) * 32
                       return (
                         <circle
                           key={i}

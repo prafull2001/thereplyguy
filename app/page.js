@@ -475,11 +475,11 @@ export default function Dashboard() {
   return (
     <>
       <ConfettiEffect trigger={confettiTrigger} />
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 px-4 sm:px-6">
       {/* Header */}
-      <div className="flex justify-between items-start mb-8">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6 sm:mb-8">
+        <div className="text-center sm:text-left">
+          <div className="flex items-center justify-center sm:justify-start gap-3 mb-2">
             <Image 
               src="/replyguylogo.png" 
               alt="Reply Guy Tracker Logo" 
@@ -487,18 +487,18 @@ export default function Dashboard() {
               height={48}
               className="rounded-lg"
             />
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--accent-primary)' }}>
+            <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--accent-primary)' }}>
               ReplyGuy
             </h1>
           </div>
-          <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-base sm:text-lg" style={{ color: 'var(--text-secondary)' }}>
             Time to be the ReplyGuy 😎
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 w-full sm:w-auto">
           <button
             onClick={() => setScreenshotMode(!screenshotMode)}
-            className={`text-sm px-4 py-2 rounded-lg border-2 transition-colors font-medium ${
+            className={`text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg border-2 transition-colors font-medium whitespace-nowrap ${
               screenshotMode 
                 ? 'border-purple-400 bg-purple-50 text-purple-700 hover:border-purple-500' 
                 : 'border-purple-300 text-purple-600 hover:border-purple-400'
@@ -514,7 +514,7 @@ export default function Dashboard() {
           </button> */}
           <button
             onClick={handleSignOut}
-            className="text-sm px-4 py-2 rounded-lg border-2 border-gray-300 hover:border-gray-400 transition-colors"
+            className="text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg border-2 border-gray-300 hover:border-gray-400 transition-colors whitespace-nowrap"
             style={{ color: 'var(--text-secondary)' }}
           >
             Sign Out
@@ -585,7 +585,7 @@ export default function Dashboard() {
             </h3>
           </div>
         
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           <div>
             <label className="block text-sm font-medium mb-3" style={{ color: 'var(--text-primary)' }}>
               <span className="text-lg">💬</span> Replies Made Today
@@ -665,7 +665,7 @@ export default function Dashboard() {
       </section>
 
       {/* Quick Overview Row - Progress + Calendar */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Progress Overview Cards */}
         <div className="lg:col-span-2">
           <section>
@@ -678,31 +678,31 @@ export default function Dashboard() {
                   height={20}
                   className="rounded"
                 />
-                <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                <h2 className="text-lg sm:text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
                   Progress Overview
                 </h2>
               </div>
-              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-xs sm:text-sm" style={{ color: 'var(--text-secondary)' }}>
                 Key metrics and achievements
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="glass-card p-4 text-center">
-                <div className="text-2xl mb-1">📈</div>
-                <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="glass-card p-3 sm:p-4 text-center">
+                <div className="text-xl sm:text-2xl mb-1">📈</div>
+                <h3 className="text-xs sm:text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
                   Days Tracked
                 </h3>
-                <p className="text-2xl font-bold" style={{ color: 'var(--accent-primary)' }}>
+                <p className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--accent-primary)' }}>
                   {historicalData.length}
                 </p>
               </div>
-              <div className="glass-card p-4 text-center">
-                <div className="text-2xl mb-1">✅</div>
-                <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+              <div className="glass-card p-3 sm:p-4 text-center">
+                <div className="text-xl sm:text-2xl mb-1">✅</div>
+                <h3 className="text-xs sm:text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
                   Goals Achieved
                 </h3>
-                <p className="text-2xl font-bold" style={{ color: 'var(--accent-secondary)' }}>
+                <p className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--accent-secondary)' }}>
                   {historicalData.filter(log => log.goal_met).length}
                 </p>
               </div>
@@ -711,7 +711,7 @@ export default function Dashboard() {
         </div>
 
         {/* Monthly Calendar */}
-        <div>
+        <div className="flex justify-center lg:block">
           <section>
             <div className="mb-4">
               <div className="flex items-center gap-3 mb-2">
@@ -722,11 +722,11 @@ export default function Dashboard() {
                   height={20}
                   className="rounded"
                 />
-                <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                <h2 className="text-lg sm:text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
                   Monthly Progress
                 </h2>
               </div>
-              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-xs sm:text-sm" style={{ color: 'var(--text-secondary)' }}>
                 Visualize your engagement patterns
               </p>
             </div>
@@ -756,20 +756,20 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
-          <div className="glass-card p-6">
-            <div className="flex items-center gap-2 mb-6">
-              <span className="text-2xl">💬</span>
-              <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="glass-card p-4 sm:p-6">
+            <div className="flex items-center gap-2 mb-4 sm:mb-6">
+              <span className="text-xl sm:text-2xl">💬</span>
+              <h3 className="text-lg sm:text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
                 Reply History
               </h3>
             </div>
             <ReplyHistoryChart data={historicalData} />
           </div>
-          <div className="glass-card p-6">
-            <div className="flex items-center gap-2 mb-6">
-              <span className="text-2xl">📈</span>
-              <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+          <div className="glass-card p-4 sm:p-6">
+            <div className="flex items-center gap-2 mb-4 sm:mb-6">
+              <span className="text-xl sm:text-2xl">📈</span>
+              <h3 className="text-lg sm:text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
                 Follower Growth
               </h3>
             </div>
@@ -780,7 +780,7 @@ export default function Dashboard() {
 
       {/* Settings Section - Less Priority */}
       <section>
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <div className="flex items-center gap-3 mb-2">
             <Image 
               src="/replyguylogo.png" 
@@ -789,28 +789,28 @@ export default function Dashboard() {
               height={24}
               className="rounded"
             />
-            <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+            <h2 className="text-xl sm:text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
               Settings
             </h2>
           </div>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-xs sm:text-sm" style={{ color: 'var(--text-secondary)' }}>
             Customize your engagement goals and preferences
           </p>
         </div>
 
-        <div className="glass-card p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl">🎯</span>
-            <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+        <div className="glass-card p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <span className="text-xl sm:text-2xl">🎯</span>
+            <h3 className="text-lg sm:text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
               Daily Reply Goal
             </h3>
           </div>
-          <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
+          <p className="mb-4 sm:mb-6 text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>
             Current goal: <span className="font-semibold" style={{ color: 'var(--accent-primary)' }}>{dailyGoal}</span> replies per day
           </p>
-          <div className="flex gap-4 items-end">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-end">
             <div className="flex-1">
-              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+              <label className="block text-xs sm:text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                 New Goal
               </label>
               <input
@@ -818,12 +818,12 @@ export default function Dashboard() {
                 value={newGoal}
                 onChange={(e) => setNewGoal(e.target.value)}
                 placeholder="Enter new goal"
-                className="input-field w-full"
+                className="input-field w-full text-sm sm:text-base"
               />
             </div>
             <button
               onClick={handleSaveGoal}
-              className="btn-secondary px-6 py-3 font-medium"
+              className="btn-secondary px-4 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-base w-full sm:w-auto"
             >
               Update Goal
             </button>
