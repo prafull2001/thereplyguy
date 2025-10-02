@@ -23,6 +23,7 @@ export default function Dashboard() {
   const [updating, setUpdating] = useState(false)
   const [onboardingCompleted, setOnboardingCompleted] = useState(false)
   const [checkingOnboarding, setCheckingOnboarding] = useState(true)
+  const [debugInfo, setDebugInfo] = useState(null)
 
   useEffect(() => {
     let isMounted = true
@@ -171,6 +172,38 @@ export default function Dashboard() {
 
   const checkOnboardingStatus = async () => {
     await checkOnboardingStatusForUser(user)
+  }
+
+  // Debug function to check current session state
+  const debugSession = async () => {
+    try {
+      console.log('=== MANUAL DEBUG SESSION ===')
+      const { data: { session } } = await supabase.auth.getSession()
+      console.log('Current session:', {
+        hasSession: !!session,
+        userId: session?.user?.id,
+        accessToken: session?.access_token?.substring(0, 20) + '...'
+      })
+
+      if (session) {
+        const response = await fetch('/api/debug-session', {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+        
+        const debugData = await response.json()
+        console.log('Debug session response:', debugData)
+        setDebugInfo(debugData)
+      } else {
+        console.log('No session found')
+        setDebugInfo({ error: 'No session found' })
+      }
+    } catch (err) {
+      console.error('Debug session error:', err)
+      setDebugInfo({ error: err.message })
+    }
   }
 
   const fetchTodayData = async () => {
@@ -364,13 +397,21 @@ export default function Dashboard() {
             Welcome back, {user.email.split('@')[0]}! 👋
           </p>
         </div>
-        <button
-          onClick={handleSignOut}
-          className="text-sm px-4 py-2 rounded-lg border-2 border-gray-300 hover:border-gray-400 transition-colors"
-          style={{ color: 'var(--text-secondary)' }}
-        >
-          Sign Out
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={debugSession}
+            className="text-sm px-4 py-2 rounded-lg border-2 border-blue-300 hover:border-blue-400 transition-colors text-blue-600"
+          >
+            Debug Session
+          </button>
+          <button
+            onClick={handleSignOut}
+            className="text-sm px-4 py-2 rounded-lg border-2 border-gray-300 hover:border-gray-400 transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            Sign Out
+          </button>
+        </div>
       </div>
 
       {/* Error Display */}
@@ -384,6 +425,23 @@ export default function Dashboard() {
           marginBottom: '24px'
         }}>
           {error}
+        </div>
+      )}
+
+      {/* Debug Info Display */}
+      {debugInfo && (
+        <div style={{ 
+          background: '#EBF8FF', 
+          border: '1px solid #BEE3F8', 
+          color: '#2B6CB0',
+          padding: '16px',
+          borderRadius: '12px',
+          marginBottom: '24px',
+          fontSize: '12px',
+          fontFamily: 'monospace'
+        }}>
+          <strong>Debug Session Info:</strong>
+          <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
         </div>
       )}
 
