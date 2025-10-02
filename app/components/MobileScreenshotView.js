@@ -56,6 +56,9 @@ export default function MobileScreenshotView({
         <div className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
           {timeString}
         </div>
+        <div className="text-sm font-medium mt-2" style={{ color: 'var(--text-secondary)' }}>
+          Time to be the ReplyGuy 😎
+        </div>
       </div>
 
       {/* Main Stats */}
