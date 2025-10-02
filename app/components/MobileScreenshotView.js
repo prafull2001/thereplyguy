@@ -60,9 +60,11 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto bg-stone-50 rounded-3xl overflow-hidden shadow-2xl" style={{ maxHeight: '90vh' }}>
-      {/* Header */}
-      <div className="bg-white p-3 text-center border-b" style={{ borderColor: 'var(--accent-primary)' }}>
+    <div className="w-full max-w-sm mx-auto space-y-4">
+      {/* Main Screenshot Container */}
+      <div className="bg-stone-50 rounded-3xl overflow-hidden shadow-2xl">
+        {/* Header */}
+        <div className="bg-white p-3 text-center border-b" style={{ borderColor: 'var(--accent-primary)' }}>
         <div className="flex items-center justify-center gap-3 mb-3">
           <Image 
             src="/replyguylogo.png" 
@@ -257,38 +259,36 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
             )}
           </div>
         </div>
-      </div>
 
-      {/* Copy Text Feature - Moved outside main stats section */}
-      <div className="px-3 pb-3">
-        <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-3 border border-purple-200">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-              📝 Share Your Progress
-            </h3>
-            <button
-              onClick={handleCopyText}
-              className={`text-xs px-3 py-1 rounded-full font-medium transition-all duration-200 ${
-                copied 
-                  ? 'bg-green-100 text-green-700 border border-green-200' 
-                  : 'bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-200'
-              }`}
-            >
-              {copied ? '✅ Copied!' : '📋 Copy'}
-            </button>
-          </div>
-          <div className="bg-white rounded-lg p-2 border border-gray-200">
-            <pre className="text-xs leading-relaxed" style={{ color: 'var(--text-primary)' }}>
-{generateCopyText()}
-            </pre>
+        {/* Footer inside screenshot container */}
+        <div className="text-center pb-3">
+          <div className="text-xs font-medium" style={{ color: 'var(--accent-primary)' }}>
+            #ReplyGuy #TwitterEngagement
           </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="text-center pb-3">
-        <div className="text-xs font-medium" style={{ color: 'var(--accent-primary)' }}>
-          #ReplyGuy #TwitterEngagement
+      {/* Copy Text Feature - Completely separate from screenshot container */}
+      <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-3 border border-purple-200 shadow-lg">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+            📝 Share Your Progress
+          </h3>
+          <button
+            onClick={handleCopyText}
+            className={`text-xs px-3 py-1 rounded-full font-medium transition-all duration-200 ${
+              copied 
+                ? 'bg-green-100 text-green-700 border border-green-200' 
+                : 'bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-200'
+            }`}
+          >
+            {copied ? '✅ Copied!' : '📋 Copy'}
+          </button>
+        </div>
+        <div className="bg-white rounded-lg p-2 border border-gray-200">
+          <pre className="text-xs leading-relaxed" style={{ color: 'var(--text-primary)' }}>
+{generateCopyText()}
+          </pre>
         </div>
       </div>
     </div>
