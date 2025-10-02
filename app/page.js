@@ -494,60 +494,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Settings Section */}
-      <section>
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Image 
-              src="/replyguylogo.png" 
-              alt="Reply Guy Logo" 
-              width={24} 
-              height={24}
-              className="rounded"
-            />
-            <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Settings
-            </h2>
-          </div>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Customize your engagement goals and preferences
-          </p>
-        </div>
-
-        <div className="glass-card p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl">🎯</span>
-            <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Daily Reply Goal
-            </h3>
-          </div>
-          <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
-            Current goal: <span className="font-semibold" style={{ color: 'var(--accent-primary)' }}>{dailyGoal}</span> replies per day
-          </p>
-          <div className="flex gap-4 items-end">
-            <div className="flex-1">
-              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                New Goal
-              </label>
-              <input
-                type="number"
-                value={newGoal}
-                onChange={(e) => setNewGoal(e.target.value)}
-                placeholder="Enter new goal"
-                className="input-field w-full"
-              />
-            </div>
-            <button
-              onClick={handleSaveGoal}
-              className="btn-secondary px-6 py-3 font-medium"
-            >
-              Update Goal
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Live Tracking Section */}
+      {/* Today's Activity Section - Primary Focus */}
       <section>
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
@@ -658,72 +605,79 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* Monthly Progress Section */}
-      <section>
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Image 
-              src="/replyguylogo.png" 
-              alt="Reply Guy Logo" 
-              width={24} 
-              height={24}
-              className="rounded"
-            />
-            <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Monthly Progress
-            </h2>
-          </div>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Visualize your engagement patterns
-          </p>
-        </div>
-        
-        <MonthlyCalendar data={historicalData} />
-      </section>
+      {/* Quick Overview Row - Progress + Calendar */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Progress Overview Cards */}
+        <div className="lg:col-span-2">
+          <section>
+            <div className="mb-4">
+              <div className="flex items-center gap-3 mb-2">
+                <Image 
+                  src="/replyguylogo.png" 
+                  alt="Reply Guy Logo" 
+                  width={20} 
+                  height={20}
+                  className="rounded"
+                />
+                <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  Progress Overview
+                </h2>
+              </div>
+              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                Key metrics and achievements
+              </p>
+            </div>
 
-      {/* Progress Overview Section */}
-      <section>
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Image 
-              src="/replyguylogo.png" 
-              alt="Reply Guy Logo" 
-              width={24} 
-              height={24}
-              className="rounded"
-            />
-            <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Progress Overview
-            </h2>
-          </div>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Key metrics and achievements
-          </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="glass-card p-4 text-center">
+                <div className="text-2xl mb-1">📈</div>
+                <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+                  Days Tracked
+                </h3>
+                <p className="text-2xl font-bold" style={{ color: 'var(--accent-primary)' }}>
+                  {historicalData.length}
+                </p>
+              </div>
+              <div className="glass-card p-4 text-center">
+                <div className="text-2xl mb-1">✅</div>
+                <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+                  Goals Achieved
+                </h3>
+                <p className="text-2xl font-bold" style={{ color: 'var(--accent-secondary)' }}>
+                  {historicalData.filter(log => log.goal_met).length}
+                </p>
+              </div>
+            </div>
+          </section>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="glass-card p-6 text-center">
-            <div className="text-3xl mb-2">📈</div>
-            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-              Total Days Tracked
-            </h3>
-            <p className="text-3xl font-bold" style={{ color: 'var(--accent-primary)' }}>
-              {historicalData.length}
-            </p>
-          </div>
-          <div className="glass-card p-6 text-center">
-            <div className="text-3xl mb-2">✅</div>
-            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-              Goals Achieved
-            </h3>
-            <p className="text-3xl font-bold" style={{ color: 'var(--accent-secondary)' }}>
-              {historicalData.filter(log => log.goal_met).length}
-            </p>
-          </div>
+        {/* Monthly Calendar */}
+        <div>
+          <section>
+            <div className="mb-4">
+              <div className="flex items-center gap-3 mb-2">
+                <Image 
+                  src="/replyguylogo.png" 
+                  alt="Reply Guy Logo" 
+                  width={20} 
+                  height={20}
+                  className="rounded"
+                />
+                <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  Monthly Progress
+                </h2>
+              </div>
+              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                Visualize your engagement patterns
+              </p>
+            </div>
+            
+            <MonthlyCalendar data={historicalData} />
+          </section>
         </div>
-      </section>
+      </div>
 
-      {/* Analytics Section */}
+      {/* Analytics Section - Charts */}
       <section>
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
@@ -743,7 +697,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6">
           <div className="glass-card p-6">
             <div className="flex items-center gap-2 mb-6">
               <span className="text-2xl">💬</span>
@@ -761,6 +715,59 @@ export default function Dashboard() {
               </h3>
             </div>
             <FollowerGrowthChart data={historicalData} />
+          </div>
+        </div>
+      </section>
+
+      {/* Settings Section - Less Priority */}
+      <section>
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Image 
+              src="/replyguylogo.png" 
+              alt="Reply Guy Logo" 
+              width={24} 
+              height={24}
+              className="rounded"
+            />
+            <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              Settings
+            </h2>
+          </div>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Customize your engagement goals and preferences
+          </p>
+        </div>
+
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl">🎯</span>
+            <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              Daily Reply Goal
+            </h3>
+          </div>
+          <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
+            Current goal: <span className="font-semibold" style={{ color: 'var(--accent-primary)' }}>{dailyGoal}</span> replies per day
+          </p>
+          <div className="flex gap-4 items-end">
+            <div className="flex-1">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                New Goal
+              </label>
+              <input
+                type="number"
+                value={newGoal}
+                onChange={(e) => setNewGoal(e.target.value)}
+                placeholder="Enter new goal"
+                className="input-field w-full"
+              />
+            </div>
+            <button
+              onClick={handleSaveGoal}
+              className="btn-secondary px-6 py-3 font-medium"
+            >
+              Update Goal
+            </button>
           </div>
         </div>
       </section>
