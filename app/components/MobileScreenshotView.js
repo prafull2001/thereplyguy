@@ -42,11 +42,11 @@ export default function MobileScreenshotView({
           <Image 
             src="/replyguylogo.png" 
             alt="ReplyGuy Logo" 
-            width={32} 
-            height={32}
+            width={40} 
+            height={40}
             className="rounded-lg"
           />
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--accent-primary)' }}>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--accent-primary)' }}>
             ReplyGuy
           </h1>
         </div>
@@ -66,7 +66,7 @@ export default function MobileScreenshotView({
         {/* Today's Progress */}
         <div className="bg-white rounded-2xl p-4 border border-stone-200">
           <div className="text-center mb-4">
-            <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Today's Progress</h2>
+            <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>📊 Today's Progress</h2>
             {goalMet && (
               <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium" style={{ background: 'var(--accent-secondary)', color: 'white' }}>
                 🎉 Goal Achieved!
@@ -76,22 +76,22 @@ export default function MobileScreenshotView({
           
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
-              <div className="text-3xl font-bold mb-1" style={{ color: 'var(--accent-primary)' }}>
+              <div className="text-4xl font-bold mb-1" style={{ color: 'var(--accent-primary)' }}>
                 {todayReplies}
               </div>
-              <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-                Replies Made
+              <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                💬 <span className="font-bold text-base" style={{ color: 'var(--accent-primary)' }}>Replies</span> Made
               </div>
               <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                Goal: {dailyGoal}
+                🎯 Goal: {dailyGoal}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold mb-1" style={{ color: 'var(--accent-secondary)' }}>
+              <div className="text-4xl font-bold mb-1" style={{ color: 'var(--accent-secondary)' }}>
                 {todayFollowers.toLocaleString()}
               </div>
-              <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-                Followers
+              <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                👥 Followers
               </div>
             </div>
           </div>
@@ -117,11 +117,11 @@ export default function MobileScreenshotView({
         {/* Weekly & Overall Stats */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white rounded-xl p-4 text-center border border-stone-200">
-            <div className="text-2xl font-bold mb-1" style={{ color: 'var(--accent-secondary)' }}>
+            <div className="text-3xl font-bold mb-1" style={{ color: 'var(--accent-secondary)' }}>
               {thisWeekGoals}
             </div>
-            <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-              This Week's Goals
+            <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+              📅 This Week's Goals
             </div>
             <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
               out of {thisWeekData.length} days
@@ -129,11 +129,11 @@ export default function MobileScreenshotView({
           </div>
           
           <div className="bg-white rounded-xl p-4 text-center border border-stone-200">
-            <div className="text-2xl font-bold mb-1" style={{ color: 'var(--accent-tertiary)' }}>
+            <div className="text-3xl font-bold mb-1" style={{ color: 'var(--accent-tertiary)' }}>
               {successRate}%
             </div>
-            <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-              Success Rate
+            <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+              🏆 Success Rate
             </div>
             <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
               {goalsAchieved}/{totalDays} days
@@ -143,7 +143,7 @@ export default function MobileScreenshotView({
 
         {/* Follower Growth Chart */}
         <div className="bg-white rounded-xl p-4 border border-stone-200">
-          <h3 className="text-sm font-bold mb-3 text-center" style={{ color: 'var(--text-primary)' }}>Follower Growth</h3>
+          <h3 className="text-lg font-bold mb-3 text-center" style={{ color: 'var(--text-primary)' }}>📈 Follower Growth</h3>
           <div className="h-20 relative">
             <svg width="100%" height="100%" viewBox="0 0 280 80" className="overflow-visible">
               {(() => {

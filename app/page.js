@@ -9,6 +9,7 @@ import FollowerGrowthChart from './components/FollowerGrowthChart'
 import OnboardingFlow from './components/OnboardingFlow'
 import MonthlyCalendar from './components/MonthlyCalendar'
 import MobileScreenshotView from './components/MobileScreenshotView'
+import ConfettiEffect from './components/ConfettiEffect'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -27,6 +28,8 @@ export default function Dashboard() {
   const [checkingOnboarding, setCheckingOnboarding] = useState(true)
   const [debugInfo, setDebugInfo] = useState(null)
   const [screenshotMode, setScreenshotMode] = useState(false)
+  const [confettiTrigger, setConfettiTrigger] = useState(0)
+  const [previousFollowers, setPreviousFollowers] = useState(0)
 
   useEffect(() => {
     let isMounted = true
@@ -272,6 +275,7 @@ export default function Dashboard() {
         const trackingData = await trackingResponse.json()
         setTodayReplies(trackingData.repliesCount || 0)
         setTodayFollowers(trackingData.followerCount || 0)
+        setPreviousFollowers(trackingData.followerCount || 0) // Initialize previous followers
         setDailyGoal(trackingData.dailyGoal || 50)
         setGoalMet(trackingData.goalMet || false)
       }
@@ -319,6 +323,17 @@ export default function Dashboard() {
       if (response.ok) {
         const data = await response.json()
         console.log('Update response:', data) // Debug logging
+        
+        // Check for follower increase and trigger confetti
+        if (type === 'followers' && data.followerCount > previousFollowers && previousFollowers > 0) {
+          setConfettiTrigger(prev => prev + 1)
+        }
+        
+        // Update previous followers for next comparison
+        if (type === 'followers') {
+          setPreviousFollowers(data.followerCount)
+        }
+        
         setTodayReplies(data.repliesCount)
         setTodayFollowers(data.followerCount)
         setGoalMet(data.goalMet)
@@ -458,7 +473,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <>
+      <ConfettiEffect trigger={confettiTrigger} />
+      <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
       <div className="flex justify-between items-start mb-8">
         <div>
@@ -813,6 +830,7 @@ export default function Dashboard() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   )
 }
