@@ -8,6 +8,7 @@ import ReplyHistoryChart from './components/ReplyHistoryChart'
 import FollowerGrowthChart from './components/FollowerGrowthChart'
 import OnboardingFlow from './components/OnboardingFlow'
 import MonthlyCalendar from './components/MonthlyCalendar'
+import MobileScreenshotView from './components/MobileScreenshotView'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -25,6 +26,7 @@ export default function Dashboard() {
   const [onboardingCompleted, setOnboardingCompleted] = useState(false)
   const [checkingOnboarding, setCheckingOnboarding] = useState(true)
   const [debugInfo, setDebugInfo] = useState(null)
+  const [screenshotMode, setScreenshotMode] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -425,6 +427,34 @@ export default function Dashboard() {
     )
   }
 
+  // Show mobile screenshot view when in screenshot mode
+  if (screenshotMode) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 py-8">
+        <div className="max-w-md mx-auto">
+          <div className="mb-6 text-center">
+            <button
+              onClick={() => setScreenshotMode(false)}
+              className="text-sm px-4 py-2 rounded-lg border-2 border-purple-300 text-purple-600 hover:border-purple-400 transition-colors font-medium mb-2"
+            >
+              ← Back to Dashboard
+            </button>
+            <p className="text-xs text-gray-600">
+              Screenshot this view to share your ReplyGuy journey!
+            </p>
+          </div>
+          <MobileScreenshotView 
+            todayReplies={todayReplies}
+            dailyGoal={dailyGoal}
+            todayFollowers={todayFollowers}
+            goalMet={goalMet}
+            historicalData={historicalData}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
@@ -447,6 +477,16 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={() => setScreenshotMode(!screenshotMode)}
+            className={`text-sm px-4 py-2 rounded-lg border-2 transition-colors font-medium ${
+              screenshotMode 
+                ? 'border-purple-400 bg-purple-50 text-purple-700 hover:border-purple-500' 
+                : 'border-purple-300 text-purple-600 hover:border-purple-400'
+            }`}
+          >
+            📱 {screenshotMode ? 'Exit' : 'Share'} Mode
+          </button>
           <button
             onClick={debugSession}
             className="text-sm px-4 py-2 rounded-lg border-2 border-blue-300 hover:border-blue-400 transition-colors text-blue-600"
