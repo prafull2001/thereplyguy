@@ -117,6 +117,19 @@ export default function Dashboard() {
 
       console.log('Checking onboarding status for user:', userObj.id)
 
+      // Check localStorage cache first
+      const cacheKey = `onboarding_${userObj.id}`
+      const cachedStatus = localStorage.getItem(cacheKey)
+      
+      if (cachedStatus === 'completed') {
+        console.log('Found cached onboarding completion, using cached status')
+        setOnboardingCompleted(true)
+        setCheckingOnboarding(false)
+        // Still fetch fresh data in background
+        fetchUserDataInBackground(userObj.id)
+        return
+      }
+
       // Get the current session to authenticate the API call
       const { data: { session } } = await supabase.auth.getSession()
       
@@ -148,6 +161,12 @@ export default function Dashboard() {
       console.log('Setting onboarding completed to:', completed)
       setOnboardingCompleted(completed)
       
+      // Cache the result
+      if (completed) {
+        localStorage.setItem(cacheKey, 'completed')
+        console.log('Cached onboarding completion for user:', userObj.id)
+      }
+      
       // Set default values if onboarding is completed
       if (completed) {
         console.log('Loading user data from API:', {
@@ -168,6 +187,32 @@ export default function Dashboard() {
       setOnboardingCompleted(false)
     } finally {
       setCheckingOnboarding(false)
+    }
+  }
+
+  const fetchUserDataInBackground = async (userId) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      const response = await fetch('/api/onboarding-status', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.currentFollowerCount !== null) {
+          setTodayFollowers(data.currentFollowerCount)
+        }
+        if (data.dailyGoal !== null) {
+          setDailyGoal(data.dailyGoal)
+        }
+      }
+    } catch (err) {
+      console.error('Background fetch error:', err)
     }
   }
 
@@ -371,6 +416,11 @@ export default function Dashboard() {
         user={user} 
         onComplete={() => {
           setOnboardingCompleted(true)
+          // Cache the completion immediately
+          if (user?.id) {
+            localStorage.setItem(`onboarding_${user.id}`, 'completed')
+            console.log('Cached onboarding completion on complete')
+          }
           checkOnboardingStatus() // Refresh the data
         }} 
       />
