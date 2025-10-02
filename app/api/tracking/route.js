@@ -97,8 +97,8 @@ export async function GET(request) {
     return NextResponse.json({
       repliesCount: todayLog.replies_made,
       followerCount: todayLog.follower_count,
-      dailyGoal: todayLog.daily_goal,
-      goalMet: todayLog.goal_met
+      dailyGoal: dailyGoal, // Use current goal from profiles, not old goal from logs
+      goalMet: todayLog.replies_made >= dailyGoal // Recalculate based on current goal
     })
 
   } catch (error) {

@@ -4,15 +4,21 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 
 export default function ReplyHistoryChart({ data }) {
   // Transform data for the chart
-  const chartData = data.map(log => ({
-    date: new Date(log.log_date).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
-    }),
-    replies: log.replies_made,
-    goal: log.daily_goal,
-    goalMet: log.goal_met
-  }))
+  const chartData = data.map(log => {
+    // Parse the date string as local date to avoid timezone issues
+    const [year, month, day] = log.log_date.split('-').map(Number)
+    const localDate = new Date(year, month - 1, day)
+    
+    return {
+      date: localDate.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric' 
+      }),
+      replies: log.replies_made,
+      goal: log.daily_goal,
+      goalMet: log.goal_met
+    }
+  })
 
   // Custom tooltip to show if goal was met
   const CustomTooltip = ({ active, payload, label }) => {
