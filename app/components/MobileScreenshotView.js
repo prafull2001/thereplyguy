@@ -257,9 +257,10 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
             )}
           </div>
         </div>
+      </div>
 
-
-        {/* Copy Text Feature */}
+      {/* Copy Text Feature - Moved outside main stats section */}
+      <div className="px-3 pb-3">
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-3 border border-purple-200">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -282,12 +283,12 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
             </pre>
           </div>
         </div>
+      </div>
 
-        {/* Footer */}
-        <div className="text-center">
-          <div className="text-xs font-medium" style={{ color: 'var(--accent-primary)' }}>
-            #ReplyGuy #TwitterEngagement
-          </div>
+      {/* Footer */}
+      <div className="text-center pb-3">
+        <div className="text-xs font-medium" style={{ color: 'var(--accent-primary)' }}>
+          #ReplyGuy #TwitterEngagement
         </div>
       </div>
     </div>
