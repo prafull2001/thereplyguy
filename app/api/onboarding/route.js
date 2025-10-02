@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+// Mark this route as dynamic to prevent static rendering
+export const dynamic = 'force-dynamic'
+
 async function getAuthenticatedSupabase(request) {
   const authHeader = request.headers.get('authorization')
   if (!authHeader) {
