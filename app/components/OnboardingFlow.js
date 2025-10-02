@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { supabase } from '../../lib/supabaseClient'
-import logo from '../assets/replyguylogo.png'
 
 export default function OnboardingFlow({ user, onComplete }) {
   const [step, setStep] = useState(1)
@@ -69,7 +68,7 @@ export default function OnboardingFlow({ user, onComplete }) {
         <div className="text-center mb-8">
           <div className="mb-4 flex justify-center">
             <Image 
-              src={logo} 
+              src="/replyguylogo.png" 
               alt="Reply Guy Tracker Logo" 
               width={80} 
               height={80}

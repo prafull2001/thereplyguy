@@ -4,7 +4,6 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { supabase } from '../../../lib/supabaseClient'
-import logo from '../../assets/replyguylogo.png'
 
 function ConfirmEmailContent() {
   const router = useRouter()
@@ -99,7 +98,7 @@ function ConfirmEmailContent() {
         <div className="mb-8">
           <div className="mb-4 flex justify-center">
             <Image 
-              src={logo} 
+              src="/replyguylogo.png" 
               alt="Reply Guy Tracker Logo" 
               width={80} 
               height={80}

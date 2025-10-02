@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { supabase } from '../../../lib/supabaseClient'
-import logo from '../../assets/replyguylogo.png'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
@@ -89,7 +88,7 @@ export default function SignIn() {
           <div className="mb-6">
             <div className="mb-4 flex justify-center">
               <Image 
-                src={logo} 
+                src="/replyguylogo.png" 
                 alt="Reply Guy Tracker Logo" 
                 width={80} 
                 height={80}

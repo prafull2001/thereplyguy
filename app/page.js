@@ -7,7 +7,6 @@ import { supabase } from '../lib/supabaseClient'
 import ReplyHistoryChart from './components/ReplyHistoryChart'
 import FollowerGrowthChart from './components/FollowerGrowthChart'
 import OnboardingFlow from './components/OnboardingFlow'
-import logo from './assets/replyguylogo.png'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -263,7 +262,7 @@ export default function Dashboard() {
         <div className="mb-8">
           <div className="mb-6 flex justify-center">
             <Image 
-              src={logo} 
+              src="/replyguylogo.png" 
               alt="Reply Guy Tracker Logo" 
               width={120} 
               height={120}
@@ -316,7 +315,7 @@ export default function Dashboard() {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <Image 
-              src={logo} 
+              src="/replyguylogo.png" 
               alt="Reply Guy Tracker Logo" 
               width={48} 
               height={48}
