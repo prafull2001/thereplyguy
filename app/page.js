@@ -487,12 +487,12 @@ export default function Dashboard() {
           >
             📱 {screenshotMode ? 'Exit' : 'Share'} Mode
           </button>
-          <button
+          {/* <button
             onClick={debugSession}
             className="text-sm px-4 py-2 rounded-lg border-2 border-blue-300 hover:border-blue-400 transition-colors text-blue-600"
           >
             Debug Session
-          </button>
+          </button> */}
           <button
             onClick={handleSignOut}
             className="text-sm px-4 py-2 rounded-lg border-2 border-gray-300 hover:border-gray-400 transition-colors"

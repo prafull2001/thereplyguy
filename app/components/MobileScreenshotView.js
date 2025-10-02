@@ -35,9 +35,9 @@ export default function MobileScreenshotView({
   const thisWeekGoals = thisWeekData.filter(log => log.goal_met).length
 
   return (
-    <div className="w-full max-w-sm mx-auto bg-gradient-to-br from-purple-50 to-blue-50 rounded-3xl overflow-hidden shadow-2xl" style={{ aspectRatio: '9/16' }}>
+    <div className="w-full max-w-sm mx-auto bg-stone-50 rounded-3xl overflow-hidden shadow-2xl" style={{ aspectRatio: '9/16' }}>
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm p-6 text-center border-b border-purple-100">
+      <div className="bg-white p-6 text-center border-b" style={{ borderColor: 'var(--accent-primary)' }}>
         <div className="flex items-center justify-center gap-3 mb-3">
           <Image 
             src="/replyguylogo.png" 
@@ -46,14 +46,14 @@ export default function MobileScreenshotView({
             height={32}
             className="rounded-lg"
           />
-          <h1 className="text-2xl font-bold text-purple-900">
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--accent-primary)' }}>
             ReplyGuy
           </h1>
         </div>
-        <div className="text-xs text-purple-600 font-medium">
+        <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
           {dateString}
         </div>
-        <div className="text-lg font-semibold text-purple-800">
+        <div className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
           {timeString}
         </div>
       </div>
@@ -61,11 +61,11 @@ export default function MobileScreenshotView({
       {/* Main Stats */}
       <div className="p-6 space-y-6">
         {/* Today's Progress */}
-        <div className="bg-white/70 rounded-2xl p-5 backdrop-blur-sm border border-white/50">
+        <div className="bg-white rounded-2xl p-5 border border-stone-200">
           <div className="text-center mb-4">
-            <h2 className="text-lg font-bold text-gray-800 mb-1">Today's Progress</h2>
+            <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Today's Progress</h2>
             {goalMet && (
-              <div className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+              <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium" style={{ background: 'var(--accent-secondary)', color: 'white' }}>
                 🎉 Goal Achieved!
               </div>
             )}
@@ -73,21 +73,21 @@ export default function MobileScreenshotView({
           
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-1">
+              <div className="text-3xl font-bold mb-1" style={{ color: 'var(--accent-primary)' }}>
                 {todayReplies}
               </div>
-              <div className="text-xs text-gray-600 font-medium">
+              <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
                 Replies Made
               </div>
-              <div className="text-xs text-gray-500">
+              <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                 Goal: {dailyGoal}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-1">
+              <div className="text-3xl font-bold mb-1" style={{ color: 'var(--accent-secondary)' }}>
                 {todayFollowers.toLocaleString()}
               </div>
-              <div className="text-xs text-gray-600 font-medium">
+              <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
                 Followers
               </div>
             </div>
@@ -95,14 +95,17 @@ export default function MobileScreenshotView({
 
           {/* Progress Bar */}
           <div className="mt-4">
-            <div className="flex justify-between text-xs text-gray-600 mb-1">
-              <span>Progress</span>
+            <div className="flex justify-between text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>
+              <span>Reply Goal Progress ({todayReplies}/{dailyGoal})</span>
               <span>{Math.min(Math.round((todayReplies / dailyGoal) * 100), 100)}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full rounded-full h-2" style={{ background: 'var(--bg-primary)' }}>
               <div 
-                className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${Math.min((todayReplies / dailyGoal) * 100, 100)}%` }}
+                className="h-2 rounded-full transition-all duration-300"
+                style={{ 
+                  width: `${Math.min((todayReplies / dailyGoal) * 100, 100)}%`,
+                  background: 'var(--accent-primary)'
+                }}
               ></div>
             </div>
           </div>
@@ -110,34 +113,63 @@ export default function MobileScreenshotView({
 
         {/* Weekly & Overall Stats */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white/70 rounded-xl p-4 text-center backdrop-blur-sm border border-white/50">
-            <div className="text-2xl font-bold text-green-600 mb-1">
+          <div className="bg-white rounded-xl p-4 text-center border border-stone-200">
+            <div className="text-2xl font-bold mb-1" style={{ color: 'var(--accent-secondary)' }}>
               {thisWeekGoals}
             </div>
-            <div className="text-xs text-gray-600 font-medium">
+            <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
               This Week's Goals
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
               out of {thisWeekData.length} days
             </div>
           </div>
           
-          <div className="bg-white/70 rounded-xl p-4 text-center backdrop-blur-sm border border-white/50">
-            <div className="text-2xl font-bold text-orange-600 mb-1">
+          <div className="bg-white rounded-xl p-4 text-center border border-stone-200">
+            <div className="text-2xl font-bold mb-1" style={{ color: 'var(--accent-tertiary)' }}>
               {successRate}%
             </div>
-            <div className="text-xs text-gray-600 font-medium">
+            <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
               Success Rate
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
               {goalsAchieved}/{totalDays} days
             </div>
           </div>
         </div>
 
-        {/* Mini Calendar Heatmap */}
-        <div className="bg-white/70 rounded-xl p-4 backdrop-blur-sm border border-white/50">
-          <h3 className="text-sm font-bold text-gray-800 mb-3 text-center">Recent Activity</h3>
+        {/* Follower Growth Chart */}
+        <div className="bg-white rounded-xl p-4 border border-stone-200">
+          <h3 className="text-sm font-bold mb-3 text-center" style={{ color: 'var(--text-primary)' }}>Follower Growth</h3>
+          <div className="h-16 flex items-end justify-between gap-1">
+            {historicalData.slice(-7).map((log, i) => {
+              const maxFollowers = Math.max(...historicalData.slice(-7).map(l => l.follower_count))
+              const height = maxFollowers > 0 ? (log.follower_count / maxFollowers) * 100 : 0
+              
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center">
+                  <div 
+                    className="w-full rounded-t transition-all duration-300"
+                    style={{ 
+                      height: `${Math.max(height, 10)}%`,
+                      background: 'var(--accent-secondary)'
+                    }}
+                  />
+                  <div className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                    {new Date(log.log_date).toLocaleDateString('en-US', { weekday: 'short' }).charAt(0)}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          <div className="text-center mt-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
+            Last 7 days growth trend
+          </div>
+        </div>
+
+        {/* Activity Heatmap */}
+        <div className="bg-white rounded-xl p-4 border border-stone-200">
+          <h3 className="text-sm font-bold mb-3 text-center" style={{ color: 'var(--text-primary)' }}>Daily Engagement Heat Map</h3>
           <div className="grid grid-cols-7 gap-1">
             {Array.from({ length: 14 }, (_, i) => {
               const date = new Date()
@@ -161,17 +193,29 @@ export default function MobileScreenshotView({
               )
             })}
           </div>
-          <div className="flex justify-center mt-2 text-xs text-gray-500">
-            Last 2 weeks
+          <div className="flex justify-between items-center mt-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
+            <span>2 weeks ago</span>
+            <span>Today</span>
+          </div>
+          <div className="flex justify-center items-center gap-3 mt-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm bg-green-500"></div>
+              <span>Goal met</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm bg-lime-400"></div>
+              <span>Active</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm bg-gray-300"></div>
+              <span>No activity</span>
+            </div>
           </div>
         </div>
 
         {/* Footer */}
         <div className="text-center">
-          <div className="text-xs text-gray-500 mb-2">
-            Building mindful engagement habits
-          </div>
-          <div className="text-xs font-medium text-purple-600">
+          <div className="text-xs font-medium" style={{ color: 'var(--accent-primary)' }}>
             #ReplyGuy #TwitterEngagement
           </div>
         </div>
