@@ -115,45 +115,49 @@ export default function Dashboard() {
 
       console.log('Checking onboarding status for user:', userObj.id)
 
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('onboarding_completed, current_follower_count, daily_goal')
-        .eq('id', userObj.id)
-        .maybeSingle() // Use maybeSingle instead of single to handle no results
-
-      console.log('Onboarding check result:', { data, error, hasData: !!data })
-
-      if (error) {
-        console.error('Error checking onboarding:', error)
+      // Get the current session to authenticate the API call
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        console.log('No session available for onboarding check')
         setOnboardingCompleted(false)
         setCheckingOnboarding(false)
         return
       }
-      
-      // If no profile exists, user needs onboarding
-      if (!data) {
-        console.log('No profile found, onboarding required')
+
+      const response = await fetch('/api/onboarding-status', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) {
+        console.error('Failed to check onboarding status:', response.status)
         setOnboardingCompleted(false)
         setCheckingOnboarding(false)
         return
       }
+
+      const data = await response.json()
+      console.log('Onboarding check result from API:', data)
       
-      const completed = data.onboarding_completed === true
-      console.log('Profile found, onboarding completed:', completed)
+      const completed = data.onboardingCompleted === true
+      console.log('Setting onboarding completed to:', completed)
       setOnboardingCompleted(completed)
       
       // Set default values if onboarding is completed
       if (completed) {
-        console.log('Loading user data from profile:', {
-          followerCount: data.current_follower_count,
-          dailyGoal: data.daily_goal
+        console.log('Loading user data from API:', {
+          followerCount: data.currentFollowerCount,
+          dailyGoal: data.dailyGoal
         })
         
-        if (data.current_follower_count !== null) {
-          setTodayFollowers(data.current_follower_count)
+        if (data.currentFollowerCount !== null) {
+          setTodayFollowers(data.currentFollowerCount)
         }
-        if (data.daily_goal !== null) {
-          setDailyGoal(data.daily_goal)
+        if (data.dailyGoal !== null) {
+          setDailyGoal(data.dailyGoal)
         }
       }
       
