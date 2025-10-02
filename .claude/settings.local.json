@@ -5,7 +5,8 @@
       "Bash(cp:*)",
       "Bash(openssl rand:*)",
       "Bash(npm run dev:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

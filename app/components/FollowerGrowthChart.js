@@ -67,7 +67,7 @@ export default function FollowerGrowthChart({ data }) {
             stroke="var(--text-secondary)"
             fontSize={12}
             domain={[minFollowers - padding, maxFollowers + padding]}
-            tickFormatter={(value) => value.toLocaleString()}
+            tickFormatter={(value) => Math.round(value).toLocaleString()}
           />
           <Tooltip content={<CustomTooltip />} />
           <Line 

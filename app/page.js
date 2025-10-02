@@ -385,13 +385,10 @@ export default function Dashboard() {
             />
           </div>
           <h1 className="text-5xl font-bold mb-4" style={{ color: 'var(--accent-primary)' }}>
-            Reply Guy
+            ReplyGuy
           </h1>
           <p className="text-xl mb-4" style={{ color: 'var(--text-secondary)' }}>
             Build mindful engagement habits on Twitter
-          </p>
-          <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
-            Track your daily replies, monitor follower growth, and develop a healthier relationship with social media
           </p>
         </div>
         
@@ -442,11 +439,11 @@ export default function Dashboard() {
               className="rounded-lg"
             />
             <h1 className="text-3xl font-bold" style={{ color: 'var(--accent-primary)' }}>
-              Reply Guy
+              ReplyGuy
             </h1>
           </div>
           <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
-            Welcome back, {user.email.split('@')[0]}! 👋
+            Time to be the ReplyGuy 😎
           </p>
         </div>
         <div className="flex gap-2">
@@ -500,9 +497,18 @@ export default function Dashboard() {
       {/* Settings Section */}
       <section>
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-            Settings
-          </h2>
+          <div className="flex items-center gap-3 mb-2">
+            <Image 
+              src="/replyguylogo.png" 
+              alt="Reply Guy Logo" 
+              width={24} 
+              height={24}
+              className="rounded"
+            />
+            <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              Settings
+            </h2>
+          </div>
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             Customize your engagement goals and preferences
           </p>
@@ -544,9 +550,18 @@ export default function Dashboard() {
       {/* Live Tracking Section */}
       <section>
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-            Today's Activity
-          </h2>
+          <div className="flex items-center gap-3 mb-2">
+            <Image 
+              src="/replyguylogo.png" 
+              alt="Reply Guy Logo" 
+              width={24} 
+              height={24}
+              className="rounded"
+            />
+            <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              Today's Activity
+            </h2>
+          </div>
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             Track your real-time engagement • {new Date().toLocaleDateString('en-US', { 
               weekday: 'long', 
@@ -560,7 +575,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-2 mb-6">
             <span className="text-2xl">⚡</span>
             <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Live Progress
+              Today's Tally
             </h3>
           </div>
         
@@ -646,11 +661,20 @@ export default function Dashboard() {
       {/* Monthly Progress Section */}
       <section>
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-            Monthly Progress
-          </h2>
+          <div className="flex items-center gap-3 mb-2">
+            <Image 
+              src="/replyguylogo.png" 
+              alt="Reply Guy Logo" 
+              width={24} 
+              height={24}
+              className="rounded"
+            />
+            <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              Monthly Progress
+            </h2>
+          </div>
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Visualize your engagement patterns • Track goal achievements over time
+            Visualize your engagement patterns
           </p>
         </div>
         
@@ -660,11 +684,20 @@ export default function Dashboard() {
       {/* Progress Overview Section */}
       <section>
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-            Progress Overview
-          </h2>
+          <div className="flex items-center gap-3 mb-2">
+            <Image 
+              src="/replyguylogo.png" 
+              alt="Reply Guy Logo" 
+              width={24} 
+              height={24}
+              className="rounded"
+            />
+            <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              Progress Overview
+            </h2>
+          </div>
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Key metrics and achievements • Your engagement journey at a glance
+            Key metrics and achievements
           </p>
         </div>
 
@@ -693,11 +726,20 @@ export default function Dashboard() {
       {/* Analytics Section */}
       <section>
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-            Analytics
-          </h2>
+          <div className="flex items-center gap-3 mb-2">
+            <Image 
+              src="/replyguylogo.png" 
+              alt="Reply Guy Logo" 
+              width={24} 
+              height={24}
+              className="rounded"
+            />
+            <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              Analytics
+            </h2>
+          </div>
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Detailed insights and trends • Understand your engagement patterns
+            Detailed insights and trends
           </p>
         </div>
 

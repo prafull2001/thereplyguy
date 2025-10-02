@@ -49,29 +49,29 @@ export default function MonthlyCalendar({ data = [] }) {
   const today = new Date().toISOString().split('T')[0]
   
   return (
-    <div className="glass-card p-6">
+    <div className="glass-card p-4 max-w-md">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">📅</span>
-          <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+          <span className="text-lg">📅</span>
+          <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
             Monthly Progress
-          </h2>
+          </h3>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={prevMonth}
-            className="w-8 h-8 rounded-lg border border-gray-300 hover:border-gray-400 flex items-center justify-center transition-colors"
+            className="w-6 h-6 rounded border border-gray-300 hover:border-gray-400 flex items-center justify-center transition-colors text-xs"
             style={{ color: 'var(--text-secondary)' }}
           >
             ←
           </button>
-          <div className="text-lg font-medium min-w-[120px] text-center" style={{ color: 'var(--text-primary)' }}>
+          <div className="text-xs font-medium min-w-[80px] text-center" style={{ color: 'var(--text-primary)' }}>
             {monthName} {year}
           </div>
           <button
             onClick={nextMonth}
-            className="w-8 h-8 rounded-lg border border-gray-300 hover:border-gray-400 flex items-center justify-center transition-colors"
+            className="w-6 h-6 rounded border border-gray-300 hover:border-gray-400 flex items-center justify-center transition-colors text-xs"
             style={{ color: 'var(--text-secondary)' }}
           >
             →
@@ -79,46 +79,36 @@ export default function MonthlyCalendar({ data = [] }) {
         </div>
       </div>
       
-      {/* Calendar Description */}
-      <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-        Track your daily engagement goals • Green = Goal achieved • Light = Activity • Gray = No data
-      </p>
-      
       {/* Day headers */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} className="text-center text-xs font-medium py-2" style={{ color: 'var(--text-secondary)' }}>
+      <div className="grid grid-cols-7 gap-0.5 mb-1">
+        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
+          <div key={day} className="text-center text-xs font-medium py-1" style={{ color: 'var(--text-secondary)' }}>
             {day}
           </div>
         ))}
       </div>
       
       {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-0.5 mb-3">
         {monthDays.map((dayData, index) => (
-          <div key={index} className="aspect-square relative">
+          <div key={index} className="w-3 h-3 relative">
             {dayData && (
               <div
                 className={`
-                  w-full h-full rounded-lg flex items-center justify-center text-sm font-medium transition-all
-                  ${dayData.date === today ? 'ring-2 ring-offset-1' : ''}
-                  ${dayData.goalMet ? 'text-white' : dayData.hasData ? 'text-gray-700' : 'text-gray-400'}
-                  hover:scale-105 cursor-pointer
+                  w-full h-full rounded-sm flex items-center justify-center transition-all
+                  ${dayData.date === today ? 'ring-1 ring-offset-0' : ''}
+                  hover:scale-110 cursor-pointer
                 `}
                 style={{
                   background: dayData.goalMet 
-                    ? 'var(--accent-secondary)' 
+                    ? '#22c55e' 
                     : dayData.hasData 
-                      ? 'rgba(168, 197, 181, 0.2)' 
-                      : 'rgba(104, 112, 123, 0.1)',
+                      ? '#a3e635' 
+                      : '#e5e7eb',
                   ringColor: dayData.date === today ? 'var(--accent-primary)' : 'transparent'
                 }}
                 title={dayData.hasData ? `${dayData.repliesMade} replies ${dayData.goalMet ? '(Goal met!)' : ''}` : 'No activity'}
               >
-                {dayData.day}
-                {dayData.hasData && (
-                  <div className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-current opacity-60"></div>
-                )}
               </div>
             )}
           </div>
@@ -126,18 +116,18 @@ export default function MonthlyCalendar({ data = [] }) {
       </div>
       
       {/* Legend */}
-      <div className="flex items-center gap-4 mt-4 text-xs" style={{ color: 'var(--text-secondary)' }}>
+      <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--text-secondary)' }}>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded" style={{ background: 'var(--accent-secondary)' }}></div>
-          <span>Goal achieved</span>
+          <div className="w-2 h-2 rounded-sm" style={{ background: '#22c55e' }}></div>
+          <span>Goal</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded" style={{ background: 'rgba(168, 197, 181, 0.2)' }}></div>
-          <span>Activity</span>
+          <div className="w-2 h-2 rounded-sm" style={{ background: '#a3e635' }}></div>
+          <span>Active</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded" style={{ background: 'rgba(104, 112, 123, 0.1)' }}></div>
-          <span>No data</span>
+          <div className="w-2 h-2 rounded-sm" style={{ background: '#e5e7eb' }}></div>
+          <span>None</span>
         </div>
       </div>
     </div>
