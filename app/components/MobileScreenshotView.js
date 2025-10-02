@@ -233,51 +233,6 @@ export default function MobileScreenshotView({
           </div>
         </div>
 
-        {/* Activity Heatmap */}
-        <div className="bg-white rounded-xl p-4 border border-stone-200">
-          <h3 className="text-sm font-bold mb-3 text-center" style={{ color: 'var(--text-primary)' }}>Daily Engagement Heat Map</h3>
-          <div className="grid grid-cols-7 gap-1">
-            {Array.from({ length: 14 }, (_, i) => {
-              const date = new Date()
-              date.setDate(date.getDate() - (13 - i))
-              const dateStr = date.toISOString().split('T')[0]
-              const dayData = historicalData.find(log => log.log_date === dateStr)
-              
-              return (
-                <div
-                  key={i}
-                  className="w-4 h-4 rounded-sm"
-                  style={{
-                    background: dayData?.goal_met 
-                      ? '#22c55e' 
-                      : dayData?.replies_made > 0 
-                        ? '#a3e635' 
-                        : '#e5e7eb'
-                  }}
-                  title={`${date.toLocaleDateString()}: ${dayData?.replies_made || 0} replies`}
-                />
-              )
-            })}
-          </div>
-          <div className="flex justify-between items-center mt-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
-            <span>2 weeks ago</span>
-            <span>Today</span>
-          </div>
-          <div className="flex justify-center items-center gap-3 mt-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-sm bg-green-500"></div>
-              <span>Goal met</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-sm bg-lime-400"></div>
-              <span>Active</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-sm bg-gray-300"></div>
-              <span>No activity</span>
-            </div>
-          </div>
-        </div>
 
         {/* Footer */}
         <div className="text-center">
