@@ -96,7 +96,7 @@ export default function MobileScreenshotView({
           {/* Progress Bar */}
           <div className="mt-4">
             <div className="flex justify-between text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>
-              <span>Reply Goal Progress ({todayReplies}/{dailyGoal})</span>
+              <span>Daily Reply Goal Progress ({todayReplies}/{dailyGoal})</span>
               <span>{Math.min(Math.round((todayReplies / dailyGoal) * 100), 100)}%</span>
             </div>
             <div className="w-full rounded-full h-2" style={{ background: 'var(--bg-primary)' }}>
@@ -141,29 +141,67 @@ export default function MobileScreenshotView({
         {/* Follower Growth Chart */}
         <div className="bg-white rounded-xl p-4 border border-stone-200">
           <h3 className="text-sm font-bold mb-3 text-center" style={{ color: 'var(--text-primary)' }}>Follower Growth</h3>
-          <div className="h-16 flex items-end justify-between gap-1">
-            {historicalData.slice(-7).map((log, i) => {
-              const maxFollowers = Math.max(...historicalData.slice(-7).map(l => l.follower_count))
-              const height = maxFollowers > 0 ? (log.follower_count / maxFollowers) * 100 : 0
-              
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center">
-                  <div 
-                    className="w-full rounded-t transition-all duration-300"
-                    style={{ 
-                      height: `${Math.max(height, 10)}%`,
-                      background: 'var(--accent-secondary)'
-                    }}
-                  />
-                  <div className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
-                    {new Date(log.log_date).toLocaleDateString('en-US', { weekday: 'short' }).charAt(0)}
-                  </div>
+          <div className="h-16 relative">
+            <svg width="100%" height="100%" viewBox="0 0 280 64" className="overflow-visible">
+              {(() => {
+                const chartData = historicalData.slice(-7)
+                if (chartData.length === 0) return null
+                
+                const maxFollowers = Math.max(...chartData.map(l => l.follower_count))
+                const minFollowers = Math.min(...chartData.map(l => l.follower_count))
+                const range = maxFollowers - minFollowers || 1
+                
+                const points = chartData.map((log, i) => {
+                  const x = (i / (chartData.length - 1)) * 240 + 20
+                  const y = 52 - ((log.follower_count - minFollowers) / range) * 40
+                  return `${x},${y}`
+                }).join(' ')
+                
+                return (
+                  <>
+                    {/* Line */}
+                    <polyline
+                      fill="none"
+                      stroke="var(--accent-secondary)"
+                      strokeWidth="2"
+                      points={points}
+                    />
+                    {/* Points */}
+                    {chartData.map((log, i) => {
+                      const x = (i / (chartData.length - 1)) * 240 + 20
+                      const y = 52 - ((log.follower_count - minFollowers) / range) * 40
+                      return (
+                        <circle
+                          key={i}
+                          cx={x}
+                          cy={y}
+                          r="3"
+                          fill="var(--accent-secondary)"
+                        />
+                      )
+                    })}
+                  </>
+                )
+              })()}
+            </svg>
+            {/* Day labels */}
+            <div className="flex justify-between absolute bottom-0 left-0 right-0 px-5">
+              {historicalData.slice(-7).map((log, i) => (
+                <div key={i} className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                  {new Date(log.log_date).toLocaleDateString('en-US', { weekday: 'short' }).charAt(0)}
                 </div>
-              )
-            })}
+              ))}
+            </div>
           </div>
           <div className="text-center mt-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
-            Last 7 days growth trend
+            {historicalData.length > 0 && (
+              <>
+                {historicalData[historicalData.length - 1]?.follower_count?.toLocaleString() || 0} followers 
+                {historicalData.length > 6 && (
+                  <span> (+{(historicalData[historicalData.length - 1]?.follower_count || 0) - (historicalData[historicalData.length - 7]?.follower_count || 0)} this week)</span>
+                )}
+              </>
+            )}
           </div>
         </div>
 
