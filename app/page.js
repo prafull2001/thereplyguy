@@ -318,9 +318,11 @@ export default function Dashboard() {
       
       if (response.ok) {
         const data = await response.json()
+        console.log('Update response:', data) // Debug logging
         setTodayReplies(data.repliesCount)
         setTodayFollowers(data.followerCount)
         setGoalMet(data.goalMet)
+        console.log('Goal met status updated to:', data.goalMet) // Debug logging
       } else {
         setError('Failed to update count')
       }

@@ -141,6 +141,7 @@ export async function POST(request) {
     let updateData = {}
     if (type === 'replies') {
       updateData.replies_made = value
+      // Always recalculate goal_met when replies are updated
       updateData.goal_met = value >= currentLog.daily_goal
     } else if (type === 'followers') {
       updateData.follower_count = value
@@ -151,6 +152,14 @@ export async function POST(request) {
         .update({ current_follower_count: value })
         .eq('id', user.id)
     }
+
+    // Ensure we always have the latest goal_met status for replies
+    if (type === 'replies') {
+      updateData.goal_met = value >= currentLog.daily_goal
+      console.log(`Goal calculation: ${value} >= ${currentLog.daily_goal} = ${updateData.goal_met}`) // Debug logging
+    }
+
+    console.log('Update data:', updateData) // Debug logging
 
     // Update the log
     const { data: updatedLog, error: updateError } = await supabase
@@ -165,6 +174,8 @@ export async function POST(request) {
       console.error('Update error:', updateError)
       return NextResponse.json({ error: 'Failed to update data' }, { status: 500 })
     }
+
+    console.log('Updated log:', updatedLog) // Debug logging
 
     return NextResponse.json({
       success: true,
