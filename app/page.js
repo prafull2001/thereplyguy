@@ -25,56 +25,74 @@ export default function Dashboard() {
   const [checkingOnboarding, setCheckingOnboarding] = useState(true)
 
   useEffect(() => {
-    const getUser = async () => {
+    let isMounted = true
+
+    const initializeAuth = async () => {
       try {
-        const { data: { user }, error } = await supabase.auth.getUser()
+        // First, try to get the current session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         
-        if (error) {
-          console.log('Auth error:', error)
+        if (sessionError) {
+          console.log('Session error:', sessionError)
         }
-        
-        setUser(user)
-        setLoading(false)
-        
-        if (user) {
-          await checkOnboardingStatus()
-        } else {
-          setCheckingOnboarding(false)
+
+        if (isMounted) {
+          const currentUser = session?.user ?? null
+          setUser(currentUser)
+          setLoading(false)
+          
+          if (currentUser) {
+            console.log('Found existing session for user:', currentUser.id)
+            await checkOnboardingStatusForUser(currentUser)
+          } else {
+            console.log('No existing session found')
+            setCheckingOnboarding(false)
+            setOnboardingCompleted(false)
+          }
         }
       } catch (error) {
-        console.error('Failed to get user:', error)
-        setUser(null)
-        setLoading(false)
-        setCheckingOnboarding(false)
+        console.error('Failed to initialize auth:', error)
+        if (isMounted) {
+          setUser(null)
+          setLoading(false)
+          setCheckingOnboarding(false)
+        }
       }
     }
 
     // Set a timeout to prevent infinite loading
     const loadingTimeout = setTimeout(() => {
-      console.log('Loading timeout reached')
-      setLoading(false)
-      setCheckingOnboarding(false)
-    }, 5000)
+      if (isMounted) {
+        console.log('Loading timeout reached')
+        setLoading(false)
+        setCheckingOnboarding(false)
+      }
+    }, 10000) // Increased to 10 seconds for better reliability
 
-    getUser().then(() => {
-      clearTimeout(loadingTimeout)
-    })
+    initializeAuth()
 
+    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id)
-      setUser(session?.user ?? null)
-      setLoading(false)
       
-      if (session?.user) {
-        // Call checkOnboardingStatus directly with the user from session
-        await checkOnboardingStatusForUser(session.user)
-      } else {
-        setCheckingOnboarding(false)
-        setOnboardingCompleted(false)
+      if (isMounted) {
+        const currentUser = session?.user ?? null
+        setUser(currentUser)
+        setLoading(false)
+        
+        if (currentUser && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+          console.log('User signed in or token refreshed, checking onboarding')
+          await checkOnboardingStatusForUser(currentUser)
+        } else if (!currentUser) {
+          console.log('User signed out')
+          setCheckingOnboarding(false)
+          setOnboardingCompleted(false)
+        }
       }
     })
 
     return () => {
+      isMounted = false
       subscription.unsubscribe()
       clearTimeout(loadingTimeout)
     }
@@ -101,27 +119,40 @@ export default function Dashboard() {
         .from('profiles')
         .select('onboarding_completed, current_follower_count, daily_goal')
         .eq('id', userObj.id)
-        .single()
+        .maybeSingle() // Use maybeSingle instead of single to handle no results
 
-      console.log('Onboarding check result:', { data, error })
+      console.log('Onboarding check result:', { data, error, hasData: !!data })
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Error checking onboarding:', error)
         setOnboardingCompleted(false)
         setCheckingOnboarding(false)
         return
       }
       
-      const completed = data?.onboarding_completed === true
-      console.log('Setting onboarding completed to:', completed)
+      // If no profile exists, user needs onboarding
+      if (!data) {
+        console.log('No profile found, onboarding required')
+        setOnboardingCompleted(false)
+        setCheckingOnboarding(false)
+        return
+      }
+      
+      const completed = data.onboarding_completed === true
+      console.log('Profile found, onboarding completed:', completed)
       setOnboardingCompleted(completed)
       
       // Set default values if onboarding is completed
       if (completed) {
-        if (data?.current_follower_count) {
+        console.log('Loading user data from profile:', {
+          followerCount: data.current_follower_count,
+          dailyGoal: data.daily_goal
+        })
+        
+        if (data.current_follower_count !== null) {
           setTodayFollowers(data.current_follower_count)
         }
-        if (data?.daily_goal) {
+        if (data.daily_goal !== null) {
           setDailyGoal(data.daily_goal)
         }
       }
