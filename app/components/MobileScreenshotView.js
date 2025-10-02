@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 
 export default function MobileScreenshotView({ 
@@ -9,6 +10,7 @@ export default function MobileScreenshotView({
   goalMet, 
   historicalData = [] 
 }) {
+  const [copied, setCopied] = useState(false)
   const now = new Date()
   const timeString = now.toLocaleTimeString('en-US', { 
     hour: 'numeric', 
@@ -33,6 +35,29 @@ export default function MobileScreenshotView({
     new Date(log.log_date) >= oneWeekAgo
   )
   const thisWeekGoals = thisWeekData.filter(log => log.goal_met).length
+
+  // Calculate previous followers (from yesterday or last available data)
+  const previousFollowers = historicalData.length > 1 
+    ? historicalData[historicalData.length - 2]?.follower_count || todayFollowers
+    : todayFollowers
+
+  // Generate copy text
+  const generateCopyText = () => {
+    return `Day ${totalDays} of building in public.
+Today's Reply Goal: ${todayReplies}/${dailyGoal}
+Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleString()}
+#bethereplyguy`
+  }
+
+  const handleCopyText = async () => {
+    try {
+      await navigator.clipboard.writeText(generateCopyText())
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
+  }
 
   return (
     <div className="w-full max-w-sm mx-auto bg-stone-50 rounded-3xl overflow-hidden shadow-2xl" style={{ maxHeight: '90vh' }}>
@@ -233,6 +258,30 @@ export default function MobileScreenshotView({
           </div>
         </div>
 
+
+        {/* Copy Text Feature */}
+        <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-3 border border-purple-200">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+              📝 Share Your Progress
+            </h3>
+            <button
+              onClick={handleCopyText}
+              className={`text-xs px-3 py-1 rounded-full font-medium transition-all duration-200 ${
+                copied 
+                  ? 'bg-green-100 text-green-700 border border-green-200' 
+                  : 'bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-200'
+              }`}
+            >
+              {copied ? '✅ Copied!' : '📋 Copy'}
+            </button>
+          </div>
+          <div className="bg-white rounded-lg p-2 border border-gray-200">
+            <pre className="text-xs leading-relaxed" style={{ color: 'var(--text-primary)' }}>
+{generateCopyText()}
+            </pre>
+          </div>
+        </div>
 
         {/* Footer */}
         <div className="text-center">

@@ -30,6 +30,7 @@ export default function Dashboard() {
   const [screenshotMode, setScreenshotMode] = useState(false)
   const [confettiTrigger, setConfettiTrigger] = useState(0)
   const [previousFollowers, setPreviousFollowers] = useState(0)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -382,6 +383,28 @@ export default function Dashboard() {
     router.push('/auth/signin')
   }
 
+  // Generate copy text for sharing
+  const generateCopyText = () => {
+    const previousFollowers = historicalData.length > 1 
+      ? historicalData[historicalData.length - 2]?.follower_count || todayFollowers
+      : todayFollowers
+    
+    return `Day ${historicalData.length} of building in public.
+Today's Reply Goal: ${todayReplies}/${dailyGoal}
+Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleString()}
+#bethereplyguy`
+  }
+
+  const handleCopyText = async () => {
+    try {
+      await navigator.clipboard.writeText(generateCopyText())
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
+  }
+
   if (loading || checkingOnboarding) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -496,6 +519,16 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 w-full sm:w-auto">
+          <button
+            onClick={handleCopyText}
+            className={`text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg border-2 transition-colors font-medium whitespace-nowrap ${
+              copied 
+                ? 'border-green-400 bg-green-50 text-green-700' 
+                : 'border-blue-300 text-blue-600 hover:border-blue-400'
+            }`}
+          >
+            {copied ? '✅ Copied!' : '📋 Copy Update'}
+          </button>
           <button
             onClick={() => setScreenshotMode(!screenshotMode)}
             className={`text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg border-2 transition-colors font-medium whitespace-nowrap ${
