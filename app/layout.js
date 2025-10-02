@@ -3,6 +3,11 @@ import './globals.css'
 export const metadata = {
   title: 'Reply Guy Tracker',
   description: 'Track your daily Twitter replies and follower growth',
+  icons: {
+    icon: '/replyguylogo.png',
+    shortcut: '/replyguylogo.png',
+    apple: '/replyguylogo.png',
+  },
 }
 
 export default function RootLayout({ children }) {
