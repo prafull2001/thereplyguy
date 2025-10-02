@@ -81,14 +81,15 @@ export default function Dashboard() {
         setUser(currentUser)
         setLoading(false)
         
-        if (currentUser && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
-          console.log('User signed in or token refreshed, checking onboarding')
+        if (currentUser && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION')) {
+          console.log('User signed in, token refreshed, or initial session loaded, checking onboarding')
           await checkOnboardingStatusForUser(currentUser)
-        } else if (!currentUser) {
-          console.log('User signed out')
+        } else if (!currentUser && event === 'SIGNED_OUT') {
+          console.log('User explicitly signed out')
           setCheckingOnboarding(false)
           setOnboardingCompleted(false)
         }
+        // Don't reset onboarding for INITIAL_SESSION with undefined user - just wait for the real session
       }
     })
 
