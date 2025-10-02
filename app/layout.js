@@ -1,7 +1,7 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'Reply Guy Tracker',
+  title: 'Reply Guy',
   description: 'Track your daily Twitter replies and follower growth',
   icons: {
     icon: '/replyguylogo.png',

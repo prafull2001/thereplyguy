@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabaseClient'
 import ReplyHistoryChart from './components/ReplyHistoryChart'
 import FollowerGrowthChart from './components/FollowerGrowthChart'
 import OnboardingFlow from './components/OnboardingFlow'
+import MonthlyCalendar from './components/MonthlyCalendar'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -384,7 +385,7 @@ export default function Dashboard() {
             />
           </div>
           <h1 className="text-5xl font-bold mb-4" style={{ color: 'var(--accent-primary)' }}>
-            Reply Guy Tracker
+            Reply Guy
           </h1>
           <p className="text-xl mb-4" style={{ color: 'var(--text-secondary)' }}>
             Build mindful engagement habits on Twitter
@@ -441,7 +442,7 @@ export default function Dashboard() {
               className="rounded-lg"
             />
             <h1 className="text-3xl font-bold" style={{ color: 'var(--accent-primary)' }}>
-              Reply Guy Tracker
+              Reply Guy
             </h1>
           </div>
           <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
@@ -496,55 +497,72 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Goal Setting */}
-      <div className="glass-card p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-2xl">🎯</span>
-          <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-            Daily Reply Goal
+      {/* Settings Section */}
+      <section>
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+            Settings
           </h2>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Customize your engagement goals and preferences
+          </p>
         </div>
-        <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
-          Current goal: <span className="font-semibold" style={{ color: 'var(--accent-primary)' }}>{dailyGoal}</span> replies per day
-        </p>
-        <div className="flex gap-4 items-end">
-          <div className="flex-1">
-            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-              New Goal
-            </label>
-            <input
-              type="number"
-              value={newGoal}
-              onChange={(e) => setNewGoal(e.target.value)}
-              placeholder="Enter new goal"
-              className="input-field w-full"
-            />
-          </div>
-          <button
-            onClick={handleSaveGoal}
-            className="btn-secondary px-6 py-3 font-medium"
-          >
-            Update Goal
-          </button>
-        </div>
-      </div>
 
-      {/* Live Tracking */}
-      <div className="glass-card p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <span className="text-2xl">⚡</span>
-          <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-            Today's Progress
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl">🎯</span>
+            <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              Daily Reply Goal
+            </h3>
+          </div>
+          <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
+            Current goal: <span className="font-semibold" style={{ color: 'var(--accent-primary)' }}>{dailyGoal}</span> replies per day
+          </p>
+          <div className="flex gap-4 items-end">
+            <div className="flex-1">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                New Goal
+              </label>
+              <input
+                type="number"
+                value={newGoal}
+                onChange={(e) => setNewGoal(e.target.value)}
+                placeholder="Enter new goal"
+                className="input-field w-full"
+              />
+            </div>
+            <button
+              onClick={handleSaveGoal}
+              className="btn-secondary px-6 py-3 font-medium"
+            >
+              Update Goal
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Live Tracking Section */}
+      <section>
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+            Today's Activity
           </h2>
-          <div className="flex-1"></div>
-          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            {new Date().toLocaleDateString('en-US', { 
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Track your real-time engagement • {new Date().toLocaleDateString('en-US', { 
               weekday: 'long', 
               month: 'short', 
               day: 'numeric' 
             })}
-          </div>
+          </p>
         </div>
+
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="text-2xl">⚡</span>
+            <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              Live Progress
+            </h3>
+          </div>
         
         <div className="grid md:grid-cols-2 gap-8">
           <div>
@@ -622,51 +640,88 @@ export default function Dashboard() {
             Updating...
           </div>
         )}
-      </div>
+        </div>
+      </section>
 
-      {/* Stats */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="glass-card p-6 text-center">
-          <div className="text-3xl mb-2">📈</div>
-          <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-            Total Days Tracked
-          </h3>
-          <p className="text-3xl font-bold" style={{ color: 'var(--accent-primary)' }}>
-            {historicalData.length}
+      {/* Monthly Progress Section */}
+      <section>
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+            Monthly Progress
+          </h2>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Visualize your engagement patterns • Track goal achievements over time
           </p>
         </div>
-        <div className="glass-card p-6 text-center">
-          <div className="text-3xl mb-2">✅</div>
-          <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-            Goals Achieved
-          </h3>
-          <p className="text-3xl font-bold" style={{ color: 'var(--accent-secondary)' }}>
-            {historicalData.filter(log => log.goal_met).length}
+        
+        <MonthlyCalendar data={historicalData} />
+      </section>
+
+      {/* Progress Overview Section */}
+      <section>
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+            Progress Overview
+          </h2>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Key metrics and achievements • Your engagement journey at a glance
           </p>
         </div>
-      </div>
 
-      {/* Charts */}
-      <div className="grid lg:grid-cols-2 gap-8 mt-8">
-        <div className="glass-card p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <span className="text-2xl">📊</span>
-            <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Reply History
-            </h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="glass-card p-6 text-center">
+            <div className="text-3xl mb-2">📈</div>
+            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+              Total Days Tracked
+            </h3>
+            <p className="text-3xl font-bold" style={{ color: 'var(--accent-primary)' }}>
+              {historicalData.length}
+            </p>
           </div>
-          <ReplyHistoryChart data={historicalData} />
-        </div>
-        <div className="glass-card p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <span className="text-2xl">📈</span>
-            <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Follower Growth
-            </h2>
+          <div className="glass-card p-6 text-center">
+            <div className="text-3xl mb-2">✅</div>
+            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+              Goals Achieved
+            </h3>
+            <p className="text-3xl font-bold" style={{ color: 'var(--accent-secondary)' }}>
+              {historicalData.filter(log => log.goal_met).length}
+            </p>
           </div>
-          <FollowerGrowthChart data={historicalData} />
         </div>
-      </div>
+      </section>
+
+      {/* Analytics Section */}
+      <section>
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+            Analytics
+          </h2>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Detailed insights and trends • Understand your engagement patterns
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-8">
+          <div className="glass-card p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="text-2xl">💬</span>
+              <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                Reply History
+              </h3>
+            </div>
+            <ReplyHistoryChart data={historicalData} />
+          </div>
+          <div className="glass-card p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="text-2xl">📈</span>
+              <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                Follower Growth
+              </h3>
+            </div>
+            <FollowerGrowthChart data={historicalData} />
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
