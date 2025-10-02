@@ -2,7 +2,9 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 import { supabase } from '../../../lib/supabaseClient'
+import logo from '../../assets/replyguylogo.png'
 
 function ConfirmEmailContent() {
   const router = useRouter()
@@ -95,6 +97,15 @@ function ConfirmEmailContent() {
     <div className="min-h-screen flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full text-center">
         <div className="mb-8">
+          <div className="mb-4 flex justify-center">
+            <Image 
+              src={logo} 
+              alt="Reply Guy Tracker Logo" 
+              width={80} 
+              height={80}
+              className="rounded-lg"
+            />
+          </div>
           <div className="text-6xl mb-4">
             {status === 'confirming' && '⏳'}
             {status === 'success' && '✅'}

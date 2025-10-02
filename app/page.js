@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { supabase } from '../lib/supabaseClient'
 import ReplyHistoryChart from './components/ReplyHistoryChart'
 import FollowerGrowthChart from './components/FollowerGrowthChart'
 import OnboardingFlow from './components/OnboardingFlow'
+import logo from './assets/replyguylogo.png'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -259,7 +261,15 @@ export default function Dashboard() {
     return (
       <div className="text-center max-w-2xl mx-auto">
         <div className="mb-8">
-          <div className="text-8xl mb-6">💬</div>
+          <div className="mb-6 flex justify-center">
+            <Image 
+              src={logo} 
+              alt="Reply Guy Tracker Logo" 
+              width={120} 
+              height={120}
+              className="rounded-lg"
+            />
+          </div>
           <h1 className="text-5xl font-bold mb-4" style={{ color: 'var(--accent-primary)' }}>
             Reply Guy Tracker
           </h1>
@@ -305,7 +315,13 @@ export default function Dashboard() {
       <div className="flex justify-between items-start mb-8">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-4xl">💬</span>
+            <Image 
+              src={logo} 
+              alt="Reply Guy Tracker Logo" 
+              width={48} 
+              height={48}
+              className="rounded-lg"
+            />
             <h1 className="text-3xl font-bold" style={{ color: 'var(--accent-primary)' }}>
               Reply Guy Tracker
             </h1>

@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { supabase } from '../../lib/supabaseClient'
+import logo from '../assets/replyguylogo.png'
 
 export default function OnboardingFlow({ user, onComplete }) {
   const [step, setStep] = useState(1)
@@ -65,7 +67,15 @@ export default function OnboardingFlow({ user, onComplete }) {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-lg w-full">
         <div className="text-center mb-8">
-          <div className="text-6xl mb-4">🎯</div>
+          <div className="mb-4 flex justify-center">
+            <Image 
+              src={logo} 
+              alt="Reply Guy Tracker Logo" 
+              width={80} 
+              height={80}
+              className="rounded-lg"
+            />
+          </div>
           <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--accent-primary)' }}>
             Welcome to Reply Guy Tracker!
           </h1>

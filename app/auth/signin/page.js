@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { supabase } from '../../../lib/supabaseClient'
+import logo from '../../assets/replyguylogo.png'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
@@ -85,7 +87,15 @@ export default function SignIn() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="mb-6">
-            <div className="text-6xl mb-4">💬</div>
+            <div className="mb-4 flex justify-center">
+              <Image 
+                src={logo} 
+                alt="Reply Guy Tracker Logo" 
+                width={80} 
+                height={80}
+                className="rounded-lg"
+              />
+            </div>
             <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--accent-primary)' }}>
               Reply Guy Tracker
             </h1>
