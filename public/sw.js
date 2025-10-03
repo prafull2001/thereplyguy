@@ -39,7 +39,8 @@ self.addEventListener('activate', (event) => {
 // Fetch event - serve from cache, but always try network first for HTML
 self.addEventListener('fetch', (event) => {
   // For HTML pages, always try network first
-  if (event.request.headers.get('accept').includes('text/html')) {
+  const acceptHeader = event.request.headers.get('accept')
+  if (acceptHeader && acceptHeader.includes('text/html')) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
