@@ -43,10 +43,10 @@ export default function MobileScreenshotView({
 
   // Generate copy text
   const generateCopyText = () => {
-    return `Day ${totalDays} of building in public.
+    return `🔥 Day ${totalDays} of growing my followers.
 Today's Reply Goal: ${todayReplies}/${dailyGoal}
 Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleString()}
-#bethereplyguy`
+#ReplyGuy #TwitterEngagement #bethereplyguy`
   }
 
   const handleCopyText = async () => {
@@ -267,9 +267,16 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
         </div>
 
         {/* Footer inside screenshot container */}
-        <div className="text-center pb-3">
+        <div className="text-center pb-3 space-y-2">
           <div className="text-xs font-medium" style={{ color: 'var(--accent-primary)' }}>
-            #ReplyGuy #TwitterEngagement
+            #ReplyGuy #TwitterEngagement #bethereplyguy
+          </div>
+          <div className="flex flex-wrap justify-center gap-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
+            <span>𝕏 @prafull_truffle</span>
+            <span>•</span>
+            <span>🌐 prafullsharma.me</span>
+            <span>•</span>
+            <span>✉️ sharmaprafull76@gmail.com</span>
           </div>
         </div>
       </div>

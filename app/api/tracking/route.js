@@ -36,8 +36,12 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get local date instead of UTC date to avoid timezone issues
-    const today = new Date().toLocaleDateString('en-CA') // en-CA format gives YYYY-MM-DD
+    // Get the date from query params (sent from client with user's timezone)
+    const url = new URL(request.url)
+    const clientDate = url.searchParams.get('date')
+    
+    // Use client date if provided, otherwise fall back to server date
+    const today = clientDate || new Date().toLocaleDateString('en-CA') // en-CA format gives YYYY-MM-DD
 
     // Get today's log entry
     const { data: todayLog, error: logError } = await supabase
@@ -117,14 +121,14 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { type, value } = await request.json() // type: 'replies' or 'followers', value: new count
+    const { type, value, date } = await request.json() // type: 'replies' or 'followers', value: new count, date: client date
     
     if (!type || value === undefined || isNaN(value) || value < 0) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 })
     }
 
-    // Get local date instead of UTC date to avoid timezone issues
-    const today = new Date().toLocaleDateString('en-CA') // en-CA format gives YYYY-MM-DD
+    // Use client date if provided, otherwise fall back to server date
+    const today = date || new Date().toLocaleDateString('en-CA') // en-CA format gives YYYY-MM-DD
 
     // Get current log for today
     const { data: currentLog, error: fetchError } = await supabase

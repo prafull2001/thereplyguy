@@ -411,7 +411,8 @@ export default function Dashboard() {
       
       // Fetch today's tracking data
       console.log('🔍 Fetching tracking data...')
-      const trackingResponse = await fetch('/api/tracking', { headers })
+      const clientDate = new Date().toLocaleDateString('en-CA') // Get client's local date
+      const trackingResponse = await fetch(`/api/tracking?date=${clientDate}`, { headers })
       if (trackingResponse.ok) {
         const trackingData = await trackingResponse.json()
         console.log('✅ Tracking data received:', trackingData)
@@ -499,7 +500,8 @@ export default function Dashboard() {
         headers,
         body: JSON.stringify({
           type: type,
-          value: newValue
+          value: newValue,
+          date: new Date().toLocaleDateString('en-CA') // Include client's local date
         })
       })
       
@@ -656,10 +658,10 @@ export default function Dashboard() {
       ? historicalData[historicalData.length - 2]?.follower_count || todayFollowers
       : todayFollowers
     
-    return `Day ${historicalData.length} of building in public.
+    return `🔥 Day ${historicalData.length} of growing my followers.
 Today's Reply Goal: ${todayReplies}/${dailyGoal}
 Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleString()}
-#bethereplyguy`
+#ReplyGuy #TwitterEngagement #bethereplyguy`
   }
 
   const handleCopyText = async () => {
@@ -688,8 +690,8 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
             <Image 
               src="/replyguylogo.png" 
               alt="Reply Guy Tracker Logo" 
-              width={120} 
-              height={120}
+              width={200} 
+              height={200}
               className="rounded-lg"
             />
           </div>
@@ -773,8 +775,8 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
             <Image 
               src="/replyguylogo.png" 
               alt="Reply Guy Tracker Logo" 
-              width={48} 
-              height={48}
+              width={80} 
+              height={80}
               className="rounded-lg"
             />
             <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--accent-primary)' }}>
@@ -838,8 +840,8 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
             <Image 
               src="/replyguylogo.png" 
               alt="Reply Guy Logo" 
-              width={24} 
-              height={24}
+              width={48} 
+              height={48}
               className="rounded"
             />
             <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
@@ -970,8 +972,8 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
                 <Image 
                   src="/replyguylogo.png" 
                   alt="Reply Guy Logo" 
-                  width={20} 
-                  height={20}
+                  width={36} 
+                  height={36}
                   className="rounded"
                 />
                 <h2 className="text-lg sm:text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
@@ -1022,8 +1024,8 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
                 <Image 
                   src="/replyguylogo.png" 
                   alt="Reply Guy Logo" 
-                  width={20} 
-                  height={20}
+                  width={36} 
+                  height={36}
                   className="rounded"
                 />
                 <h2 className="text-lg sm:text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
@@ -1065,8 +1067,8 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
             <Image 
               src="/replyguylogo.png" 
               alt="Reply Guy Logo" 
-              width={24} 
-              height={24}
+              width={48} 
+              height={48}
               className="rounded"
             />
             <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
@@ -1115,8 +1117,8 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
             <Image 
               src="/replyguylogo.png" 
               alt="Reply Guy Logo" 
-              width={24} 
-              height={24}
+              width={48} 
+              height={48}
               className="rounded"
             />
             <h2 className="text-xl sm:text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
@@ -1157,6 +1159,42 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
             >
               Update Goal
             </button>
+          </div>
+        </div>
+      </section>
+      
+      {/* Contact Section */}
+      <section className="mt-12 pt-8 border-t" style={{ borderColor: 'var(--bg-secondary)' }}>
+        <div className="text-center">
+          <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
+            Issues? Contact me here:
+          </p>
+          <div className="flex flex-wrap justify-center gap-4 text-sm">
+            <a 
+              href="https://twitter.com/prafull_truffle" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:opacity-80 transition-opacity"
+              style={{ color: 'var(--accent-primary)' }}
+            >
+              𝕏 @prafull_truffle
+            </a>
+            <a 
+              href="https://prafullsharma.me" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:opacity-80 transition-opacity"
+              style={{ color: 'var(--accent-primary)' }}
+            >
+              🌐 prafullsharma.me
+            </a>
+            <a 
+              href="mailto:sharmaprafull76@gmail.com" 
+              className="hover:opacity-80 transition-opacity"
+              style={{ color: 'var(--accent-primary)' }}
+            >
+              ✉️ sharmaprafull76@gmail.com
+            </a>
           </div>
         </div>
       </section>
