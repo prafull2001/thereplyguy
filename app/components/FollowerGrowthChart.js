@@ -4,14 +4,20 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 export default function FollowerGrowthChart({ data }) {
   // Transform data for the chart
-  const chartData = data.map(log => ({
-    date: new Date(log.log_date).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
-    }),
-    followers: log.follower_count,
-    fullDate: log.log_date
-  }))
+  const chartData = data.map(log => {
+    // Parse the date string as local date to avoid timezone issues
+    const [year, month, day] = log.log_date.split('-').map(Number)
+    const localDate = new Date(year, month - 1, day)
+    
+    return {
+      date: localDate.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric' 
+      }),
+      followers: log.follower_count,
+      fullDate: log.log_date
+    }
+  })
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload, label }) => {

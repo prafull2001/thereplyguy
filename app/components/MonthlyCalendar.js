@@ -81,8 +81,8 @@ export default function MonthlyCalendar({ data = [] }) {
       
       {/* Day headers */}
       <div className="grid grid-cols-7 gap-0.5 mb-1">
-        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-          <div key={day} className="text-center text-xs font-medium py-1" style={{ color: 'var(--text-secondary)' }}>
+        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+          <div key={`${day}-${index}`} className="text-center text-xs font-medium py-1" style={{ color: 'var(--text-secondary)' }}>
             {day}
           </div>
         ))}

@@ -26,7 +26,6 @@ export default function Dashboard() {
   const [updating, setUpdating] = useState(false)
   const [onboardingCompleted, setOnboardingCompleted] = useState(false)
   const [checkingOnboarding, setCheckingOnboarding] = useState(true)
-  const [debugInfo, setDebugInfo] = useState(null)
   const [screenshotMode, setScreenshotMode] = useState(false)
   const [confettiTrigger, setConfettiTrigger] = useState(0)
   const [previousFollowers, setPreviousFollowers] = useState(0)
@@ -37,11 +36,77 @@ export default function Dashboard() {
 
     const initializeAuth = async () => {
       try {
-        // First, try to get the current session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        console.log('🔄 Initializing auth...')
+        
+        // Check if there are any localStorage conflicts
+        const localStorageKeys = Object.keys(localStorage).filter(key => key.startsWith('sb-'))
+        console.log('📦 Found localStorage keys:', localStorageKeys)
+        
+        // First, try to get the current session with timeout
+        console.log('🔍 Attempting to get session...')
+        
+        let session = null;
+        let sessionError = null;
+        
+        try {
+          // Add timeout to prevent hanging
+          const sessionPromise = supabase.auth.getSession()
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Session check timeout')), 1500)
+          )
+          
+          const result = await Promise.race([sessionPromise, timeoutPromise])
+          session = result.data?.session
+          sessionError = result.error
+          
+          console.log('🔑 Session check result:', {
+            hasSession: !!session,
+            userId: session?.user?.id,
+            error: sessionError?.message
+          })
+        } catch (timeoutError) {
+          console.log('⏰ Session check timed out:', timeoutError.message)
+          console.log('🔧 Attempting manual session parsing from localStorage...')
+          
+          // Try to manually parse the session from localStorage as fallback
+          try {
+            const storedToken = localStorage.getItem('sb-uwqgvarjyscdnwifzwkj-auth-token')
+            if (storedToken) {
+              const tokenData = JSON.parse(storedToken)
+              console.log('🔍 Found stored token data:', {
+                hasAccessToken: !!tokenData.access_token,
+                hasUser: !!tokenData.user,
+                expiresAt: tokenData.expires_at
+              })
+              
+              // Check if token is still valid
+              const now = Math.floor(Date.now() / 1000)
+              if (tokenData.expires_at && tokenData.expires_at > now) {
+                console.log('✅ Token is still valid, using manual session')
+                session = {
+                  access_token: tokenData.access_token,
+                  refresh_token: tokenData.refresh_token,
+                  expires_in: tokenData.expires_in,
+                  expires_at: tokenData.expires_at,
+                  token_type: tokenData.token_type || 'bearer',
+                  user: tokenData.user
+                }
+                sessionError = null // Clear the timeout error
+              } else {
+                console.log('❌ Token expired')
+              }
+            }
+          } catch (parseError) {
+            console.log('❌ Failed to parse stored token:', parseError)
+          }
+          
+          if (!session) {
+            sessionError = timeoutError
+          }
+        }
         
         if (sessionError) {
-          console.log('Session error:', sessionError)
+          console.log('❌ Session error:', sessionError)
         }
 
         if (isMounted) {
@@ -50,12 +115,20 @@ export default function Dashboard() {
           setLoading(false)
           
           if (currentUser) {
-            console.log('Found existing session for user:', currentUser.id)
+            console.log('✅ Found existing session for user:', currentUser.id)
+            // Clear the timeout since we have a user
+            clearTimeout(loadingTimeout)
+            console.log('🚫 Timeout cleared - user found')
             await checkOnboardingStatusForUser(currentUser)
           } else {
-            console.log('No existing session found')
+            console.log('❌ No existing session found - redirecting to sign in')
             setCheckingOnboarding(false)
             setOnboardingCompleted(false)
+            // If no session and we've waited long enough, redirect to sign in
+            if (!currentUser) {
+              console.log('🔄 Redirecting to sign in page...')
+              router.push('/auth/signin')
+            }
           }
         }
       } catch (error) {
@@ -71,11 +144,12 @@ export default function Dashboard() {
     // Set a timeout to prevent infinite loading
     const loadingTimeout = setTimeout(() => {
       if (isMounted) {
-        console.log('Loading timeout reached')
+        console.log('⏰ Loading timeout reached - redirecting to sign in')
         setLoading(false)
         setCheckingOnboarding(false)
+        router.push('/auth/signin')
       }
-    }, 10000) // Increased to 10 seconds for better reliability
+    }, 8000) // Increased to 8 seconds to allow for onboarding API call
 
     initializeAuth()
 
@@ -90,11 +164,22 @@ export default function Dashboard() {
         
         if (currentUser && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION')) {
           console.log('User signed in, token refreshed, or initial session loaded, checking onboarding')
+          // Clear timeout since we have a user
+          clearTimeout(loadingTimeout)
+          console.log('🚫 Timeout cleared - auth state change')
           await checkOnboardingStatusForUser(currentUser)
         } else if (!currentUser && event === 'SIGNED_OUT') {
-          console.log('User explicitly signed out')
+          console.log('User explicitly signed out, redirecting to sign in')
           setCheckingOnboarding(false)
           setOnboardingCompleted(false)
+          // Clear all state
+          setTodayReplies(0)
+          setTodayFollowers(0)
+          setDailyGoal(50)
+          setHistoricalData([])
+          setGoalMet(false)
+          // Redirect to sign in page
+          router.push('/auth/signin')
         }
         // Don't reset onboarding for INITIAL_SESSION with undefined user - just wait for the real session
       }
@@ -115,30 +200,72 @@ export default function Dashboard() {
 
   const checkOnboardingStatusForUser = async (userObj) => {
     try {
+      console.log('🔄 checkOnboardingStatusForUser called with:', userObj?.id)
+      
       if (!userObj?.id) {
-        console.log('No user provided for onboarding check')
+        console.log('❌ No user provided for onboarding check')
         setOnboardingCompleted(false)
         setCheckingOnboarding(false)
         return
       }
 
-      console.log('Checking onboarding status for user:', userObj.id)
+      console.log('📝 Checking onboarding status for user:', userObj.id)
 
       // Check localStorage cache first
+      console.log('📦 Checking localStorage cache...')
       const cacheKey = `onboarding_${userObj.id}`
       const cachedStatus = localStorage.getItem(cacheKey)
+      console.log('📦 Cached status:', cachedStatus)
       
       if (cachedStatus === 'completed') {
-        console.log('Found cached onboarding completion, using cached status')
+        console.log('✅ Found cached onboarding completion, using cached status')
         setOnboardingCompleted(true)
         setCheckingOnboarding(false)
         // Still fetch fresh data in background
+        console.log('🔄 Fetching user data in background...')
         fetchUserDataInBackground(userObj.id)
         return
       }
 
-      // Get the current session to authenticate the API call
-      const { data: { session } } = await supabase.auth.getSession()
+      // Get the current session to authenticate the API call (with same fallback as main auth)
+      console.log('🔍 Getting session for API authentication...')
+      let session = null
+      
+      try {
+        // Try normal session check with timeout
+        const sessionPromise = supabase.auth.getSession()
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session check timeout in onboarding')), 1500)
+        )
+        
+        const result = await Promise.race([sessionPromise, timeoutPromise])
+        session = result.data?.session
+        console.log('✅ Session obtained normally for onboarding check:', !!session)
+      } catch (timeoutError) {
+        console.log('⏰ Onboarding session check timed out, using manual fallback')
+        
+        // Use the manually parsed session from localStorage (same as main auth)
+        const storedToken = localStorage.getItem('sb-uwqgvarjyscdnwifzwkj-auth-token')
+        if (storedToken) {
+          try {
+            const tokenData = JSON.parse(storedToken)
+            const now = Math.floor(Date.now() / 1000)
+            if (tokenData.expires_at && tokenData.expires_at > now) {
+              console.log('✅ Using manual session for onboarding check')
+              session = {
+                access_token: tokenData.access_token,
+                refresh_token: tokenData.refresh_token,
+                expires_in: tokenData.expires_in,
+                expires_at: tokenData.expires_at,
+                token_type: tokenData.token_type || 'bearer',
+                user: tokenData.user
+              }
+            }
+          } catch (parseError) {
+            console.log('❌ Failed to parse stored token for onboarding:', parseError)
+          }
+        }
+      }
       
       if (!session) {
         console.log('No session available for onboarding check')
@@ -147,12 +274,22 @@ export default function Dashboard() {
         return
       }
 
-      const response = await fetch('/api/onboarding-status', {
+      console.log('🔍 Making onboarding status API call...')
+      
+      // Add timeout to the onboarding API call
+      const fetchPromise = fetch('/api/onboarding-status', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'
         }
       })
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Onboarding API timeout')), 5000)
+      )
+      
+      const response = await Promise.race([fetchPromise, timeoutPromise])
+      console.log('✅ Onboarding API call completed')
 
       if (!response.ok) {
         console.error('Failed to check onboarding status:', response.status)
@@ -227,65 +364,75 @@ export default function Dashboard() {
     await checkOnboardingStatusForUser(user)
   }
 
-  // Debug function to check current session state
-  const debugSession = async () => {
-    try {
-      console.log('=== MANUAL DEBUG SESSION ===')
-      const { data: { session } } = await supabase.auth.getSession()
-      console.log('Current session:', {
-        hasSession: !!session,
-        userId: session?.user?.id,
-        accessToken: session?.access_token?.substring(0, 20) + '...'
-      })
-
-      if (session) {
-        const response = await fetch('/api/debug-session', {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json'
-          }
-        })
-        
-        const debugData = await response.json()
-        console.log('Debug session response:', debugData)
-        setDebugInfo(debugData)
-      } else {
-        console.log('No session found')
-        setDebugInfo({ error: 'No session found' })
-      }
-    } catch (err) {
-      console.error('Debug session error:', err)
-      setDebugInfo({ error: err.message })
-    }
-  }
 
   const fetchTodayData = async () => {
     try {
+      console.log('🔄 fetchTodayData called')
       setIsLoading(true)
       
-      // Get session to include in API calls
-      const { data: { session } } = await supabase.auth.getSession()
+      // Get session to include in API calls (with same timeout handling)
+      let session = null
+      try {
+        const sessionPromise = supabase.auth.getSession()
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session timeout in fetchTodayData')), 1500)
+        )
+        const result = await Promise.race([sessionPromise, timeoutPromise])
+        session = result.data?.session
+        console.log('✅ Session for fetchTodayData:', !!session)
+      } catch (timeoutError) {
+        console.log('⏰ fetchTodayData session timed out, using manual fallback')
+        const storedToken = localStorage.getItem('sb-uwqgvarjyscdnwifzwkj-auth-token')
+        if (storedToken) {
+          try {
+            const tokenData = JSON.parse(storedToken)
+            const now = Math.floor(Date.now() / 1000)
+            if (tokenData.expires_at && tokenData.expires_at > now) {
+              session = {
+                access_token: tokenData.access_token,
+                refresh_token: tokenData.refresh_token,
+                expires_in: tokenData.expires_in,
+                expires_at: tokenData.expires_at,
+                token_type: tokenData.token_type || 'bearer',
+                user: tokenData.user
+              }
+              console.log('✅ Manual session for fetchTodayData')
+            }
+          } catch (parseError) {
+            console.log('❌ Failed to parse token for fetchTodayData:', parseError)
+          }
+        }
+      }
+      
       const headers = session ? { 
         'Authorization': `Bearer ${session.access_token}`,
         'Content-Type': 'application/json'
       } : { 'Content-Type': 'application/json' }
       
       // Fetch today's tracking data
+      console.log('🔍 Fetching tracking data...')
       const trackingResponse = await fetch('/api/tracking', { headers })
       if (trackingResponse.ok) {
         const trackingData = await trackingResponse.json()
+        console.log('✅ Tracking data received:', trackingData)
         setTodayReplies(trackingData.repliesCount || 0)
         setTodayFollowers(trackingData.followerCount || 0)
         setPreviousFollowers(trackingData.followerCount || 0) // Initialize previous followers
         setDailyGoal(trackingData.dailyGoal || 50)
         setGoalMet(trackingData.goalMet || false)
+      } else {
+        console.error('❌ Failed to fetch tracking data:', trackingResponse.status)
       }
 
       // Fetch historical logs for charts
+      console.log('🔍 Fetching historical logs...')
       const logsResponse = await fetch('/api/logs', { headers })
       if (logsResponse.ok) {
         const logsData = await logsResponse.json()
+        console.log('✅ Historical data received:', logsData.length, 'records')
         setHistoricalData(logsData)
+      } else {
+        console.error('❌ Failed to fetch logs:', logsResponse.status)
       }
     } catch (err) {
       setError('Failed to fetch data')
@@ -306,7 +453,42 @@ export default function Dashboard() {
         ? Math.max(0, todayReplies + change)
         : Math.max(0, todayFollowers + change)
       
-      const { data: { session } } = await supabase.auth.getSession()
+      console.log(`🔄 Updating ${type} to:`, newValue)
+      
+      // Use the same session timeout handling as other functions
+      let session = null
+      try {
+        const sessionPromise = supabase.auth.getSession()
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session timeout in updateCount')), 1500)
+        )
+        const result = await Promise.race([sessionPromise, timeoutPromise])
+        session = result.data?.session
+        console.log('✅ Session for updateCount:', !!session)
+      } catch (timeoutError) {
+        console.log('⏰ updateCount session timed out, using manual fallback')
+        const storedToken = localStorage.getItem('sb-uwqgvarjyscdnwifzwkj-auth-token')
+        if (storedToken) {
+          try {
+            const tokenData = JSON.parse(storedToken)
+            const now = Math.floor(Date.now() / 1000)
+            if (tokenData.expires_at && tokenData.expires_at > now) {
+              session = {
+                access_token: tokenData.access_token,
+                refresh_token: tokenData.refresh_token,
+                expires_in: tokenData.expires_in,
+                expires_at: tokenData.expires_at,
+                token_type: tokenData.token_type || 'bearer',
+                user: tokenData.user
+              }
+              console.log('✅ Manual session for updateCount')
+            }
+          } catch (parseError) {
+            console.log('❌ Failed to parse token for updateCount:', parseError)
+          }
+        }
+      }
+      
       const headers = session ? { 
         'Authorization': `Bearer ${session.access_token}`,
         'Content-Type': 'application/json'
@@ -354,7 +536,42 @@ export default function Dashboard() {
     if (!newGoal || isNaN(newGoal)) return
     
     try {
-      const { data: { session } } = await supabase.auth.getSession()
+      console.log('🔄 Saving goal:', newGoal)
+      
+      // Use the same session timeout handling
+      let session = null
+      try {
+        const sessionPromise = supabase.auth.getSession()
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session timeout in handleSaveGoal')), 1500)
+        )
+        const result = await Promise.race([sessionPromise, timeoutPromise])
+        session = result.data?.session
+        console.log('✅ Session for handleSaveGoal:', !!session)
+      } catch (timeoutError) {
+        console.log('⏰ handleSaveGoal session timed out, using manual fallback')
+        const storedToken = localStorage.getItem('sb-uwqgvarjyscdnwifzwkj-auth-token')
+        if (storedToken) {
+          try {
+            const tokenData = JSON.parse(storedToken)
+            const now = Math.floor(Date.now() / 1000)
+            if (tokenData.expires_at && tokenData.expires_at > now) {
+              session = {
+                access_token: tokenData.access_token,
+                refresh_token: tokenData.refresh_token,
+                expires_in: tokenData.expires_in,
+                expires_at: tokenData.expires_at,
+                token_type: tokenData.token_type || 'bearer',
+                user: tokenData.user
+              }
+              console.log('✅ Manual session for handleSaveGoal')
+            }
+          } catch (parseError) {
+            console.log('❌ Failed to parse token for handleSaveGoal:', parseError)
+          }
+        }
+      }
+      
       const response = await fetch('/api/user', {
         method: 'POST',
         headers: { 
@@ -368,6 +585,8 @@ export default function Dashboard() {
         setDailyGoal(parseInt(newGoal))
         setNewGoal('')
         setError('')
+        // Refresh the data to ensure everything is in sync
+        await fetchTodayData()
       } else {
         setError('Failed to save goal')
       }
@@ -379,9 +598,57 @@ export default function Dashboard() {
 
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/auth/signin')
+    try {
+      console.log('🔄 Signing out...')
+      
+      // Sign out from Supabase with timeout (same pattern as other Supabase calls)
+      try {
+        const signOutPromise = supabase.auth.signOut()
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Sign out timeout')), 1500)
+        )
+        
+        await Promise.race([signOutPromise, timeoutPromise])
+        console.log('✅ Supabase sign out successful')
+      } catch (timeoutError) {
+        console.log('⏰ Supabase sign out timed out, proceeding with manual cleanup')
+      }
+      
+      // Clear any manual localStorage session data
+      const keys = Object.keys(localStorage).filter(key => key.startsWith('sb-'))
+      keys.forEach(key => {
+        console.log('🗑️ Removing:', key)
+        localStorage.removeItem(key)
+      })
+      
+      // Clear any onboarding cache
+      const onboardingKeys = Object.keys(localStorage).filter(key => key.startsWith('onboarding_'))
+      onboardingKeys.forEach(key => {
+        console.log('🗑️ Removing onboarding cache:', key)
+        localStorage.removeItem(key)
+      })
+      
+      // Clear all dashboard state
+      setUser(null)
+      setTodayReplies(0)
+      setTodayFollowers(0)
+      setDailyGoal(50)
+      setHistoricalData([])
+      setGoalMet(false)
+      setOnboardingCompleted(false)
+      setCheckingOnboarding(false)
+      
+      console.log('✅ Sign out complete, redirecting...')
+      router.push('/auth/signin')
+    } catch (error) {
+      console.error('❌ Sign out error:', error)
+      // Fallback: force clear everything and redirect
+      localStorage.clear()
+      setUser(null)
+      router.push('/auth/signin')
+    }
   }
+
 
   // Generate copy text for sharing
   const generateCopyText = () => {
@@ -539,12 +806,6 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
           >
             📱 {screenshotMode ? 'Exit' : 'Share'} Mode
           </button>
-          {/* <button
-            onClick={debugSession}
-            className="text-sm px-4 py-2 rounded-lg border-2 border-blue-300 hover:border-blue-400 transition-colors text-blue-600"
-          >
-            Debug Session
-          </button> */}
           <button
             onClick={handleSignOut}
             className="text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg border-2 border-gray-300 hover:border-gray-400 transition-colors whitespace-nowrap"
@@ -569,22 +830,6 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
         </div>
       )}
 
-      {/* Debug Info Display */}
-      {debugInfo && (
-        <div style={{ 
-          background: '#EBF8FF', 
-          border: '1px solid #BEE3F8', 
-          color: '#2B6CB0',
-          padding: '16px',
-          borderRadius: '12px',
-          marginBottom: '24px',
-          fontSize: '12px',
-          fontFamily: 'monospace'
-        }}>
-          <strong>Debug Session Info:</strong>
-          <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
-        </div>
-      )}
 
       {/* Today's Activity Section - Primary Focus */}
       <section>
@@ -627,23 +872,32 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
               <button
                 type="button"
                 onClick={() => updateCount('replies', -1)}
-                disabled={updating || todayReplies <= 0}
+                disabled={updating || todayReplies <= 0 || isLoading}
                 className="counter-btn disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 −
               </button>
               <div className="flex-1 text-center">
-                <div className="text-3xl font-bold" style={{ color: 'var(--accent-primary)' }}>
-                  {todayReplies}
-                </div>
-                <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  Goal: {dailyGoal}
-                </div>
+                {isLoading ? (
+                  <>
+                    <div className="animate-pulse bg-gray-300 rounded h-8 w-16 mx-auto mb-2"></div>
+                    <div className="animate-pulse bg-gray-300 rounded h-4 w-20 mx-auto"></div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-3xl font-bold" style={{ color: 'var(--accent-primary)' }}>
+                      {todayReplies}
+                    </div>
+                    <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      Goal: {dailyGoal}
+                    </div>
+                  </>
+                )}
               </div>
               <button
                 type="button"
                 onClick={() => updateCount('replies', 1)}
-                disabled={updating}
+                disabled={updating || isLoading}
                 className="counter-btn disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 +
@@ -664,23 +918,32 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
               <button
                 type="button"
                 onClick={() => updateCount('followers', -1)}
-                disabled={updating || todayFollowers <= 0}
+                disabled={updating || todayFollowers <= 0 || isLoading}
                 className="counter-btn disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 −
               </button>
               <div className="flex-1 text-center">
-                <div className="text-3xl font-bold" style={{ color: 'var(--accent-secondary)' }}>
-                  {todayFollowers.toLocaleString()}
-                </div>
-                <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  Followers
-                </div>
+                {isLoading ? (
+                  <>
+                    <div className="animate-pulse bg-gray-300 rounded h-8 w-20 mx-auto mb-2"></div>
+                    <div className="animate-pulse bg-gray-300 rounded h-4 w-16 mx-auto"></div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-3xl font-bold" style={{ color: 'var(--accent-secondary)' }}>
+                      {todayFollowers.toLocaleString()}
+                    </div>
+                    <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      Followers
+                    </div>
+                  </>
+                )}
               </div>
               <button
                 type="button"
                 onClick={() => updateCount('followers', 1)}
-                disabled={updating}
+                disabled={updating || isLoading}
                 className="counter-btn disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 +
@@ -726,18 +989,26 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
                 <h3 className="text-xs sm:text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
                   Days Tracked
                 </h3>
-                <p className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--accent-primary)' }}>
-                  {historicalData.length}
-                </p>
+                {isLoading ? (
+                  <div className="animate-pulse bg-gray-300 rounded h-6 sm:h-8 w-8 sm:w-12 mx-auto"></div>
+                ) : (
+                  <p className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--accent-primary)' }}>
+                    {historicalData.length}
+                  </p>
+                )}
               </div>
               <div className="glass-card p-3 sm:p-4 text-center">
                 <div className="text-xl sm:text-2xl mb-1">✅</div>
                 <h3 className="text-xs sm:text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
                   Goals Achieved
                 </h3>
-                <p className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--accent-secondary)' }}>
-                  {historicalData.filter(log => log.goal_met).length}
-                </p>
+                {isLoading ? (
+                  <div className="animate-pulse bg-gray-300 rounded h-6 sm:h-8 w-8 sm:w-12 mx-auto"></div>
+                ) : (
+                  <p className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--accent-secondary)' }}>
+                    {historicalData.filter(log => log.goal_met).length}
+                  </p>
+                )}
               </div>
             </div>
           </section>
@@ -764,7 +1035,25 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
               </p>
             </div>
             
-            <MonthlyCalendar data={historicalData} />
+            {isLoading ? (
+              <div className="glass-card p-4 max-w-md">
+                <div className="animate-pulse">
+                  <div className="bg-gray-300 rounded h-6 w-32 mb-3"></div>
+                  <div className="grid grid-cols-7 gap-0.5 mb-1">
+                    {Array(7).fill(0).map((_, i) => (
+                      <div key={i} className="bg-gray-300 rounded h-4 w-4"></div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-7 gap-0.5 mb-3">
+                    {Array(35).fill(0).map((_, i) => (
+                      <div key={i} className="bg-gray-300 rounded h-3 w-3"></div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <MonthlyCalendar data={historicalData} />
+            )}
           </section>
         </div>
       </div>
@@ -797,7 +1086,11 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
                 Reply History
               </h3>
             </div>
-            <ReplyHistoryChart data={historicalData} />
+            {isLoading ? (
+              <div className="animate-pulse bg-gray-300 rounded h-40 w-full"></div>
+            ) : (
+              <ReplyHistoryChart data={historicalData} />
+            )}
           </div>
           <div className="glass-card p-4 sm:p-6">
             <div className="flex items-center gap-2 mb-4 sm:mb-6">
@@ -806,7 +1099,11 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
                 Follower Growth
               </h3>
             </div>
-            <FollowerGrowthChart data={historicalData} />
+            {isLoading ? (
+              <div className="animate-pulse bg-gray-300 rounded h-40 w-full"></div>
+            ) : (
+              <FollowerGrowthChart data={historicalData} />
+            )}
           </div>
         </div>
       </section>
