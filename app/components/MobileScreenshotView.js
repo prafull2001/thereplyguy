@@ -242,7 +242,12 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
                   const showLabel = i === 0 || i === Math.floor(arr.length / 2) || i === arr.length - 1
                   return (
                     <div key={i} className="text-xs flex-1 text-center" style={{ color: showLabel ? 'var(--text-secondary)' : 'transparent' }}>
-                      {showLabel ? new Date(log.log_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
+                      {showLabel ? (() => {
+                        // Parse date as local to avoid timezone issues
+                        const [year, month, day] = log.log_date.split('-').map(Number)
+                        const localDate = new Date(year, month - 1, day)
+                        return localDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                      })() : ''}
                     </div>
                   )
                 })}

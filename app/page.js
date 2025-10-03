@@ -26,7 +26,6 @@ export default function Dashboard() {
   const [updating, setUpdating] = useState(false)
   const [onboardingCompleted, setOnboardingCompleted] = useState(false)
   const [checkingOnboarding, setCheckingOnboarding] = useState(true)
-  const [debugInfo, setDebugInfo] = useState(null)
   const [screenshotMode, setScreenshotMode] = useState(false)
   const [confettiTrigger, setConfettiTrigger] = useState(0)
   const [previousFollowers, setPreviousFollowers] = useState(0)
@@ -170,9 +169,17 @@ export default function Dashboard() {
           console.log('🚫 Timeout cleared - auth state change')
           await checkOnboardingStatusForUser(currentUser)
         } else if (!currentUser && event === 'SIGNED_OUT') {
-          console.log('User explicitly signed out')
+          console.log('User explicitly signed out, redirecting to sign in')
           setCheckingOnboarding(false)
           setOnboardingCompleted(false)
+          // Clear all state
+          setTodayReplies(0)
+          setTodayFollowers(0)
+          setDailyGoal(50)
+          setHistoricalData([])
+          setGoalMet(false)
+          // Redirect to sign in page
+          router.push('/auth/signin')
         }
         // Don't reset onboarding for INITIAL_SESSION with undefined user - just wait for the real session
       }
@@ -357,37 +364,6 @@ export default function Dashboard() {
     await checkOnboardingStatusForUser(user)
   }
 
-  // Debug function to check current session state
-  const debugSession = async () => {
-    try {
-      console.log('=== MANUAL DEBUG SESSION ===')
-      const { data: { session } } = await supabase.auth.getSession()
-      console.log('Current session:', {
-        hasSession: !!session,
-        userId: session?.user?.id,
-        accessToken: session?.access_token?.substring(0, 20) + '...'
-      })
-
-      if (session) {
-        const response = await fetch('/api/debug-session', {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json'
-          }
-        })
-        
-        const debugData = await response.json()
-        console.log('Debug session response:', debugData)
-        setDebugInfo(debugData)
-      } else {
-        console.log('No session found')
-        setDebugInfo({ error: 'No session found' })
-      }
-    } catch (err) {
-      console.error('Debug session error:', err)
-      setDebugInfo({ error: err.message })
-    }
-  }
 
   const fetchTodayData = async () => {
     try {
@@ -622,21 +598,57 @@ export default function Dashboard() {
 
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/auth/signin')
+    try {
+      console.log('🔄 Signing out...')
+      
+      // Sign out from Supabase with timeout (same pattern as other Supabase calls)
+      try {
+        const signOutPromise = supabase.auth.signOut()
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Sign out timeout')), 1500)
+        )
+        
+        await Promise.race([signOutPromise, timeoutPromise])
+        console.log('✅ Supabase sign out successful')
+      } catch (timeoutError) {
+        console.log('⏰ Supabase sign out timed out, proceeding with manual cleanup')
+      }
+      
+      // Clear any manual localStorage session data
+      const keys = Object.keys(localStorage).filter(key => key.startsWith('sb-'))
+      keys.forEach(key => {
+        console.log('🗑️ Removing:', key)
+        localStorage.removeItem(key)
+      })
+      
+      // Clear any onboarding cache
+      const onboardingKeys = Object.keys(localStorage).filter(key => key.startsWith('onboarding_'))
+      onboardingKeys.forEach(key => {
+        console.log('🗑️ Removing onboarding cache:', key)
+        localStorage.removeItem(key)
+      })
+      
+      // Clear all dashboard state
+      setUser(null)
+      setTodayReplies(0)
+      setTodayFollowers(0)
+      setDailyGoal(50)
+      setHistoricalData([])
+      setGoalMet(false)
+      setOnboardingCompleted(false)
+      setCheckingOnboarding(false)
+      
+      console.log('✅ Sign out complete, redirecting...')
+      router.push('/auth/signin')
+    } catch (error) {
+      console.error('❌ Sign out error:', error)
+      // Fallback: force clear everything and redirect
+      localStorage.clear()
+      setUser(null)
+      router.push('/auth/signin')
+    }
   }
 
-  // Debug function to clear localStorage if there are conflicts
-  const clearLocalSession = () => {
-    console.log('🗑️ Clearing local session data...')
-    const keys = Object.keys(localStorage).filter(key => key.startsWith('sb-'))
-    keys.forEach(key => {
-      console.log('🗑️ Removing:', key)
-      localStorage.removeItem(key)
-    })
-    console.log('✅ Local session cleared, refreshing...')
-    window.location.reload()
-  }
 
   // Generate copy text for sharing
   const generateCopyText = () => {
@@ -795,18 +807,6 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
             📱 {screenshotMode ? 'Exit' : 'Share'} Mode
           </button>
           <button
-            onClick={debugSession}
-            className="text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg border-2 border-blue-300 hover:border-blue-400 transition-colors text-blue-600 whitespace-nowrap"
-          >
-            Debug Session
-          </button>
-          <button
-            onClick={clearLocalSession}
-            className="text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg border-2 border-red-300 hover:border-red-400 transition-colors text-red-600 whitespace-nowrap"
-          >
-            Clear Local Session
-          </button>
-          <button
             onClick={handleSignOut}
             className="text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg border-2 border-gray-300 hover:border-gray-400 transition-colors whitespace-nowrap"
             style={{ color: 'var(--text-secondary)' }}
@@ -830,22 +830,6 @@ Followers: ${previousFollowers.toLocaleString()} → ${todayFollowers.toLocaleSt
         </div>
       )}
 
-      {/* Debug Info Display */}
-      {debugInfo && (
-        <div style={{ 
-          background: '#EBF8FF', 
-          border: '1px solid #BEE3F8', 
-          color: '#2B6CB0',
-          padding: '16px',
-          borderRadius: '12px',
-          marginBottom: '24px',
-          fontSize: '12px',
-          fontFamily: 'monospace'
-        }}>
-          <strong>Debug Session Info:</strong>
-          <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
-        </div>
-      )}
 
       {/* Today's Activity Section - Primary Focus */}
       <section>

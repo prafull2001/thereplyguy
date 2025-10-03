@@ -36,7 +36,8 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const today = new Date().toISOString().split('T')[0]
+    // Get local date instead of UTC date to avoid timezone issues
+    const today = new Date().toLocaleDateString('en-CA') // en-CA format gives YYYY-MM-DD
 
     // Get today's log entry
     const { data: todayLog, error: logError } = await supabase
@@ -122,7 +123,8 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 })
     }
 
-    const today = new Date().toISOString().split('T')[0]
+    // Get local date instead of UTC date to avoid timezone issues
+    const today = new Date().toLocaleDateString('en-CA') // en-CA format gives YYYY-MM-DD
 
     // Get current log for today
     const { data: currentLog, error: fetchError } = await supabase
