@@ -66,8 +66,27 @@ export async function GET(request) {
     const dailyGoal = profile?.daily_goal || 50
     const currentFollowers = profile?.current_follower_count || 0
 
-    // If no log for today exists, create one
+    // If no log for today exists, create one - but check again first to prevent race conditions
     if (logError?.code === 'PGRST116') {
+      // Double-check that a log doesn't already exist (race condition prevention)
+      const { data: existingLog, error: recheckError } = await supabase
+        .from('logs')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('log_date', today)
+        .single()
+      
+      if (existingLog) {
+        // Found an existing log, return it
+        return NextResponse.json({
+          repliesCount: existingLog.replies_made,
+          followerCount: existingLog.follower_count,
+          dailyGoal: dailyGoal,
+          goalMet: existingLog.replies_made >= dailyGoal
+        })
+      }
+      
+      // Still no log, create one
       const { data: newLog, error: createError } = await supabase
         .from('logs')
         .insert({
@@ -82,15 +101,33 @@ export async function GET(request) {
         .single()
 
       if (createError) {
+        // If we get a unique violation error, fetch the existing record
+        if (createError.code === '23505') { // Unique violation
+          const { data: conflictLog } = await supabase
+            .from('logs')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('log_date', today)
+            .single()
+          
+          if (conflictLog) {
+            return NextResponse.json({
+              repliesCount: conflictLog.replies_made,
+              followerCount: conflictLog.follower_count,
+              dailyGoal: dailyGoal,
+              goalMet: conflictLog.replies_made >= dailyGoal
+            })
+          }
+        }
         console.error('Create log error:', createError)
         return NextResponse.json({ error: 'Failed to create daily log' }, { status: 500 })
       }
 
       return NextResponse.json({
-        repliesCount: 0,
-        followerCount: currentFollowers,
-        dailyGoal: dailyGoal,
-        goalMet: false
+        repliesCount: newLog?.replies_made || 0,
+        followerCount: newLog?.follower_count || currentFollowers,
+        dailyGoal: newLog?.daily_goal || dailyGoal,
+        goalMet: newLog?.goal_met || false
       })
     }
 
