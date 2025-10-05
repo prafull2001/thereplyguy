@@ -43,15 +43,7 @@ export async function GET(request) {
     // Use client date if provided, otherwise fall back to server date
     const today = clientDate || new Date().toLocaleDateString('en-CA') // en-CA format gives YYYY-MM-DD
 
-    // Get today's log entry
-    const { data: todayLog, error: logError } = await supabase
-      .from('logs')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('log_date', today)
-      .single()
-
-    // Get user's profile data
+    // Get user's profile data first
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('daily_goal, current_follower_count')
@@ -66,36 +58,26 @@ export async function GET(request) {
     const dailyGoal = profile?.daily_goal || 50
     const currentFollowers = profile?.current_follower_count || 0
 
-    // If no log for today exists, create one
-    if (logError?.code === 'PGRST116') {
-      const { data: newLog, error: createError } = await supabase
-        .from('logs')
-        .insert({
-          user_id: user.id,
-          log_date: today,
-          replies_made: 0,
-          follower_count: currentFollowers,
-          daily_goal: dailyGoal,
-          goal_met: false
-        })
-        .select()
-        .single()
-
-      if (createError) {
-        console.error('Create log error:', createError)
-        return NextResponse.json({ error: 'Failed to create daily log' }, { status: 500 })
-      }
-
-      return NextResponse.json({
-        repliesCount: 0,
-        followerCount: currentFollowers,
-        dailyGoal: dailyGoal,
-        goalMet: false
+    // Use UPSERT to atomically get or create today's log entry
+    // This prevents race conditions when multiple requests try to create the same log
+    const { data: todayLog, error: upsertError } = await supabase
+      .from('logs')
+      .upsert({
+        user_id: user.id,
+        log_date: today,
+        replies_made: 0,
+        follower_count: currentFollowers,
+        daily_goal: dailyGoal,
+        goal_met: false
+      }, {
+        onConflict: 'user_id,log_date',
+        ignoreDuplicates: false // Return the existing record if it already exists
       })
-    }
+      .select()
+      .single()
 
-    if (logError) {
-      console.error('Log error:', logError)
+    if (upsertError) {
+      console.error('Upsert log error:', upsertError)
       return NextResponse.json({ error: 'Database error' }, { status: 500 })
     }
 
